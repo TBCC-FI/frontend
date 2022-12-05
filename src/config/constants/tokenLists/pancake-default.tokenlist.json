@@ -1,0 +1,38 @@
+{
+  "name": "PancakeSwap Default List",
+  "timestamp": "2021-05-06T00:00:00Z",
+  "version": {
+    "major": 3,
+    "minor": 0,
+    "patch": 0
+  },
+  "tags": {},
+  "logoURI": "https://pancakeswap.finance/logo.png",
+  "keywords": ["pancake", "default"],
+  "tokens": [
+    {
+      "name": "TBCC",
+      "symbol": "TBCC",
+      "address": "0xf29480344d8e21efeab7fde39f8d8299056a7fea",
+      "chainId": 56,
+      "decimals": 18,
+      "logoURI": "https://assets.trustwalletapp.com/blockchains/smartchain/assets/0xf29480344d8e21EFeAB7Fde39F8D8299056A7FEA/logo.png"
+    },
+    {
+      "name": "BUSD Token",
+      "symbol": "BUSD",
+      "address": "0xe9e7cea3dedca5984780bafc599bd69add087d56",
+      "chainId": 56,
+      "decimals": 18,
+      "logoURI": "https://exchange.pancakeswap.finance/images/coins/0xe9e7cea3dedca5984780bafc599bd69add087d56.png"
+    },
+    {
+      "name": "B8DEX",
+      "symbol": "B8T",
+      "address": "0x4dcCa80514c13dAcBd4A00c4E8dB891592a89306",
+      "chainId": 56,
+      "decimals": 18,
+      "logoURI": "https://assets.trustwalletapp.com/blockchains/smartchain/assets/0xf29480344d8e21EFeAB7Fde39F8D8299056A7FEA/logo.png"
+    }
+  ]
+}
