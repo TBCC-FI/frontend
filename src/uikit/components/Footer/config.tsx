@@ -42,26 +42,26 @@ export const footerSupportLinks: FooterLinkType[] = [
   }
 ]
 
-export const socials: FooterLinkType[] = [ 
+export const socials: FooterLinkType[] = [
   {
-    label: 'Telegram channel',
-    href: 'https://t.me/b8dex',
+    label: 'Telegram EN channel',
+    href: 'https://t.me/tbccglobal',
   },
   {
-    label: 'Telegram chat',
-    href: 'https://t.me/b8dex',
+    label: 'Telegram EN chat',
+    href: 'https://t.me/tbcc_exchange_eng',
+  },
+  {
+    label: 'Telegram CH channel',
+    href: 'https://t.me/tbcc_ex_chat',
+  },
+  {
+    label: 'Telegram CH chat',
+    href: 'https://t.me/tbcc_ex_news',
   },
   {
     label: 'Twitter',
-    href: 'https://twitter.com/b8dex',
-  },
-  {
-    label: 'Facebook',
-    href: 'https://instagram.com/b8dex_exchange_',
-  },
-  {
-    label: 'Discord',
-    href: 'https://instagram.com/b8dex_exchange_',
+    href: 'https://twitter.com/TBCC_ex',
   }
 ]
 
