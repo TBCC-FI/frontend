@@ -1,13 +1,16 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import { Text, Flex, Box, Skeleton, useMatchBreakpoints, ArrowBackIcon, ArrowForwardIcon } from '../../../../uikit'
 import { TokenData } from 'state/info/types'
-import { Link } from 'react-router-dom'
-import { CurrencyLogo } from 'views/Swap/components/CurrencyLogo'
+// import { Link } from 'react-router-dom'
+import { CurrencyLogo } from 'components/Logo'
 import { formatAmount } from 'views/Swap/utils/formatInfoNumbers'
-import Percent from 'views/Swap/components/Percent'
 import { useTranslation } from 'contexts/Localization'
-import { ClickableColumnHeader, TableWrapper, PageButtons, Arrow, Break } from './shared'
+import Percent from '../Percent'
+import { Text, Flex, Box, Skeleton, useMatchBreakpoints, Card } from '../../../../uikit'
+import { ClickableColumnHeader, TableWrapper, Break } from './shared'
+import PageSwitcher from "../PageSwitcher";
+import {Token} from "../../../../sdk";
+import {useToken} from "../../../../hooks/Tokens";
 
 /**
  *  Columns on different layouts
@@ -17,47 +20,51 @@ import { ClickableColumnHeader, TableWrapper, PageButtons, Arrow, Break } from '
  *  2 = |   | Name |       |              | Volume 24H |     |
  *  On smallest screen Name is reduced to just symbol
  */
-const ResponsiveGrid = styled.div`
+const ResponsiveHeaderGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   align-items: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 
-  padding: 0 24px;
+  padding: 0 10px;
+  margin-bottom: 10px;
 
   grid-template-columns: 20px 3fr repeat(4, 1fr);
 
   @media screen and (max-width: 900px) {
-    grid-template-columns: 20px 2fr repeat(3, 1fr);
-    & :nth-child(4) {
-      display: none;
-    }
-  }
-
-  @media screen and (max-width: 800px) {
-    grid-template-columns: 20px 2fr repeat(2, 1fr);
-    & :nth-child(6) {
-      display: none;
-    }
-  }
-
-  @media screen and (max-width: 670px) {
-    grid-template-columns: 1fr 1fr;
+    width: 770px;
+    grid-template-columns: 1.5fr repeat(4, 1fr);
     > *:first-child {
       display: none;
     }
-    > *:nth-child(3) {
+  }
+`
+const ResponsiveGrid = styled.div`
+  display: grid;
+  grid-gap: 1em;
+  
+  grid-template-columns: 20px 3fr repeat(4, 1fr);
+
+  @media screen and (max-width: 900px) {
+    width: 770px;
+    grid-template-columns: 1.5fr repeat(4, 1fr);
+    > *:first-child {
       display: none;
     }
   }
 `
 
-const LinkWrapper = styled(Link)`
-  text-decoration: none;
-  :hover {
-    cursor: pointer;
-    opacity: 0.7;
-  }
-`
+// const LinkWrapper = styled(Link)`
+//   text-decoration: none;
+//   :hover {
+//     cursor: pointer;
+//     opacity: 0.7;
+//   }
+// `
 
 const ResponsiveLogo = styled(CurrencyLogo)`
   @media screen and (max-width: 670px) {
@@ -87,31 +94,30 @@ const TableLoader: React.FC = () => {
 }
 
 const DataRow: React.FC<{ tokenData: TokenData; index: number }> = ({ tokenData, index }) => {
-  const { isXs, isSm } = useMatchBreakpoints()
+  const { isMobile } = useMatchBreakpoints()
+  const tokenLogoData: Token = useToken(tokenData.address)
+
   return (
-    <LinkWrapper to={`/info/token/${tokenData.address}`}>
+    // <LinkWrapper to={`/info/token/${tokenData.address}`}>
       <ResponsiveGrid>
-        <Flex>
-          <Text>{index + 1}</Text>
+        <Flex ml='10px'>
+          <Text fontSize='16px' color='#FFF'>{index + 1}</Text>
         </Flex>
-        <Flex alignItems="center">
-          <ResponsiveLogo address={tokenData.address} />
-          {(isXs || isSm) && <Text ml="8px">{tokenData.symbol}</Text>}
-          {!isXs && !isSm && (
-            <Flex marginLeft="10px">
-              <Text>{tokenData.name}</Text>
-              <Text ml="8px">({tokenData.symbol})</Text>
-            </Flex>
-          )}
+        <Flex alignItems="center" ml={isMobile ? '0' : '14px'}>
+          <ResponsiveLogo currency={tokenLogoData} />
+          <Flex marginLeft="10px">
+            <Text fontSize='14px' fontWeight='400' color='#FFF'>{tokenData.name}</Text>
+            <Text ml="8px" fontSize='14px' fontWeight='400' color='#a9aab2'>({tokenData.symbol})</Text>
+          </Flex>
         </Flex>
-        <Text fontWeight={400}>${formatAmount(tokenData.priceUSD, { notation: 'standard' })}</Text>
-        <Text fontWeight={400}>
-          <Percent value={tokenData.priceUSDChange} fontWeight={400} />
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(tokenData.priceUSD, { notation: 'standard' })}</Text>
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>
+          <Percent value={tokenData.priceUSDChange} fontSize='14px' fontWeight='400' color='#959595' />
         </Text>
-        <Text fontWeight={400}>${formatAmount(tokenData.volumeUSD)}</Text>
-        <Text fontWeight={400}>${formatAmount(tokenData.liquidityUSD)}</Text>
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(tokenData.volumeUSD)}</Text>
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(tokenData.liquidityUSD)}</Text>
       </ResponsiveGrid>
-    </LinkWrapper>
+    // </LinkWrapper>
   )
 }
 
@@ -124,12 +130,13 @@ const SORT_FIELD = {
   priceUSDChangeWeek: 'priceUSDChangeWeek',
 }
 
-const MAX_ITEMS = 10
+const MAX_ITEMS = 5
 
 const TokenTable: React.FC<{
   tokenDatas: TokenData[] | undefined
   maxItems?: number
 }> = ({ tokenDatas, maxItems = MAX_ITEMS }) => {
+  const { isMobile } = useMatchBreakpoints()
   const [sortField, setSortField] = useState(SORT_FIELD.volumeUSD)
   const [sortDirection, setSortDirection] = useState<boolean>(true)
 
@@ -150,15 +157,15 @@ const TokenTable: React.FC<{
   const sortedTokens = useMemo(() => {
     return tokenDatas
       ? tokenDatas
-          .sort((a, b) => {
-            if (a && b) {
-              return a[sortField as keyof TokenData] > b[sortField as keyof TokenData]
-                ? (sortDirection ? -1 : 1) * 1
-                : (sortDirection ? -1 : 1) * -1
-            }
-            return -1
-          })
-          .slice(maxItems * (page - 1), page * maxItems)
+        .sort((a, b) => {
+          if (a && b) {
+            return a[sortField as keyof TokenData] > b[sortField as keyof TokenData]
+              ? (sortDirection ? -1 : 1) * 1
+              : (sortDirection ? -1 : 1) * -1
+          }
+          return -1
+        })
+        .slice(maxItems * (page - 1), page * maxItems)
       : []
   }, [tokenDatas, maxItems, page, sortDirection, sortField])
 
@@ -183,97 +190,85 @@ const TokenTable: React.FC<{
   }
 
   return (
-    <TableWrapper>
-      <ResponsiveGrid>
-        <Text color="secondary" fontSize="12px" bold>
-          #
-        </Text>
-        <ClickableColumnHeader
-          color="secondary"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.name)}
-          textTransform="uppercase"
-        >
-          {t('Name')} {arrow(SORT_FIELD.name)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="secondary"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.priceUSD)}
-          textTransform="uppercase"
-        >
-          {t('Price')} {arrow(SORT_FIELD.priceUSD)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="secondary"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.priceUSDChange)}
-          textTransform="uppercase"
-        >
-          {t('Price Change')} {arrow(SORT_FIELD.priceUSDChange)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="secondary"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.volumeUSD)}
-          textTransform="uppercase"
-        >
-          {t('Volume 24H')} {arrow(SORT_FIELD.volumeUSD)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="secondary"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.liquidityUSD)}
-          textTransform="uppercase"
-        >
-          {t('Liquidity')} {arrow(SORT_FIELD.liquidityUSD)}
-        </ClickableColumnHeader>
-      </ResponsiveGrid>
+    <Card p={isMobile ? '0 12px' : '0px'} mb={isMobile ? '15px' : '20px'}>
+      <Text fontSize='20px' fontWeight='600' color='#FFF' m={isMobile ? '28px 22px 0 22px' : '25px 30px 0 35px'}>
+        {t('Top Tokens')}
+      </Text>
+      <TableWrapper style={{margin: isMobile ? '0px 22px 24px' : '10px 30px 30px 35px', width: isMobile ? 'calc(100% - 44px)' : 'calc(100% - 65px)'}}>
 
-      <Break />
-      {sortedTokens.length > 0 ? (
-        <>
-          {sortedTokens.map((data, i) => {
-            if (data) {
-              return (
-                <React.Fragment key={data.address}>
-                  <DataRow index={(page - 1) * MAX_ITEMS + i} tokenData={data} />
-                  <Break />
-                </React.Fragment>
-              )
-            }
-            return null
-          })}
-          <PageButtons>
-            <Arrow
-              onClick={() => {
-                setPage(page === 1 ? page : page - 1)
-              }}
+        <ResponsiveHeaderGrid style={{marginTop: '15px'}}>
+          <Text color="rgba(255, 255, 255, 0.6)" fontSize="13px">
+            #
+          </Text>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.name)}
+          >
+            {t('Name')} {arrow(SORT_FIELD.name)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.priceUSD)}
+          >
+            {t('Price')} {arrow(SORT_FIELD.priceUSD)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.priceUSDChange)}
+          >
+            {t('Change')} {arrow(SORT_FIELD.priceUSDChange)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.volumeUSD)}
+          >
+            {t('Volume 24H')} {arrow(SORT_FIELD.volumeUSD)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.liquidityUSD)}
+          >
+            {t('Liquidity')} {arrow(SORT_FIELD.liquidityUSD)}
+          </ClickableColumnHeader>
+        </ResponsiveHeaderGrid>
+
+
+        {sortedTokens.length > 0 ? (
+          <>
+            {sortedTokens.map((data, i) => {
+              if (data) {
+                return (
+                  <React.Fragment key={`${data.address}${i + 1}`}>
+                    <DataRow index={(page - 1) * MAX_ITEMS + i} tokenData={data} />
+                    {
+                      (i < sortedTokens.length - 1) ? <Break style={{marginBottom: '10px'}}/> : null
+                    }
+                  </React.Fragment>
+                )
+              }
+              return null
+            })}
+            <Flex
+              width='100%'
+              alignItems='center'
+              justifyContent='center'
             >
-              <ArrowBackIcon color={page === 1 ? 'textDisabled' : 'primary'} />
-            </Arrow>
-            <Text>{t('Page %page% of %maxPage%', { page, maxPage })}</Text>
-            <Arrow
-              onClick={() => {
-                setPage(page === maxPage ? page : page + 1)
-              }}
-            >
-              <ArrowForwardIcon color={page === maxPage ? 'textDisabled' : 'primary'} />
-            </Arrow>
-          </PageButtons>
-        </>
-      ) : (
-        <>
-          <TableLoader />
-          <Box />
-        </>
-      )}
-    </TableWrapper>
+              <PageSwitcher activePage={page} maxPages={maxPage} setPage={(index) => setPage(index)}/>
+            </Flex>
+          </>
+        ) : (
+          <>
+            <TableLoader />
+            <Box />
+          </>
+        )}
+      </TableWrapper>
+    </Card>
   )
 }
 

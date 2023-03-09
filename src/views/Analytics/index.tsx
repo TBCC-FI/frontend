@@ -6,7 +6,6 @@ import Pools from './Pools'
 import PoolPage from './Pools/PoolPage'
 import Tokens from './Tokens'
 import RedirectInvalidToken from './Tokens/redirects'
-import Footer from "../../components/Menu/Footer";
 
 const Analytics: React.FC = () => {
   return (
@@ -26,7 +25,6 @@ const Analytics: React.FC = () => {
       </Route>
       <Route exact path={['/analytics/tokens/:address', '/analytics/token/:address']} component={RedirectInvalidToken} />
       <Route exact path={['/analytics/pools/:address', '/analytics/pool/:address', '/analytics/pair/:address']} component={PoolPage} />
-      <Footer/>
     </>
   )
 }

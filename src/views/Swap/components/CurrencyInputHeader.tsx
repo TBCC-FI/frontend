@@ -51,7 +51,11 @@ const CurrencyInputHeader: React.FC<Props> = ({ isActiveTab }) => {
           <IconButton variant="light" scale="sm" mr="18px">
             <NewRefreshIcon/>
           </IconButton>
-          <GlobalSettings color="#CDEDFF" mr="4px" />
+          {
+            (isActiveTab === 'Swap') ? (
+              <GlobalSettings color="#CDEDFF" mr="4px" />
+            ) : null
+          }
         </Flex>
       </Flex>
     </CurrencyInputContainer>

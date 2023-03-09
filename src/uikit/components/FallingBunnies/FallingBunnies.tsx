@@ -72,7 +72,7 @@ const FallingBunnies: React.FC<FallingBunniesProps> = ({
   duration = 10,
 }) => {
   const bunnies = [...Array(count)].map((_, index) => (
-    <Bunny key={String(index)} position={Math.random() * 100} iterations={iterations} duration={duration}>
+    <Bunny key={String(index+1)} position={Math.random() * 100} iterations={iterations} duration={duration}>
       <BunnyIcon width={size} height={size} />
     </Bunny>
   ))

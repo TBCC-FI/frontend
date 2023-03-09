@@ -1,11 +1,11 @@
 import React, { useMemo, useEffect } from 'react'
-import { Text, Heading, Card } from '../../../uikit'
 import Page from 'components/Layout/Page'
 import TokenTable from 'views/Swap/components/InfoTables/TokensTable'
 import { useAllTokenData, useTokenDatas } from 'state/info/hooks'
 import { useWatchlistTokens } from 'state/user/hooks'
 import { useTranslation } from 'contexts/Localization'
 import TopTokenMovers from 'views/Swap/components/TopTokenMovers'
+import { Text, Heading, Card } from '../../../uikit'
 
 const TokensOverview: React.FC = () => {
   const { t } = useTranslation()

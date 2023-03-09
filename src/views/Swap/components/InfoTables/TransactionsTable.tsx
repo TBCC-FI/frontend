@@ -4,15 +4,14 @@ import React, { useCallback, useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import { formatDistanceToNowStrict } from 'date-fns'
 import {space} from "styled-system";
-import { Text, Flex, Box, Skeleton, LinkExternal, ArrowForwardIcon, ArrowBackIcon } from '../../../../uikit'
 import { formatAmount } from 'views/Analytics/utils/formatInfoNumbers'
 import { getBscScanLink } from 'utils'
 import truncateHash from 'utils/truncateHash'
 import { Transaction, TransactionType } from 'state/info/types'
 import { ITEMS_PER_INFO_TABLE_PAGE } from 'config/constants/info'
 import { useTranslation } from 'contexts/Localization'
+import { Text, Flex, Box, Skeleton, LinkExternal, ArrowForwardIcon, ArrowBackIcon, RadioProps } from '../../../../uikit'
 import { ClickableColumnHeader, TableWrapper, PageButtons, Arrow } from './shared'
-import {RadioProps} from "../../../../uikit";
 
 
 const Wrapper = styled.div`
@@ -158,8 +157,8 @@ const DataRow: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
           {transaction.type === TransactionType.MINT
             ? t('Add %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })
             : transaction.type === TransactionType.SWAP
-            ? t('Swap %token0% for %token1%', { token0: inputTokenSymbol, token1: outputTokenSymbol })
-            : t('Remove %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })}
+              ? t('Swap %token0% for %token1%', { token0: inputTokenSymbol, token1: outputTokenSymbol })
+              : t('Remove %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })}
         </Text>
       </LinkExternal>
       <Text>${formatAmount(transaction.amountUSD)}</Text>
@@ -193,19 +192,19 @@ const TransactionTable: React.FC<{
   const sortedTransactions = useMemo(() => {
     return transactions
       ? transactions
-          .slice()
-          .sort((a, b) => {
-            if (a && b) {
-              return a[sortField as keyof Transaction] > b[sortField as keyof Transaction]
-                ? (sortDirection ? -1 : 1) * 1
-                : (sortDirection ? -1 : 1) * -1
-            }
-            return -1
-          })
-          .filter((x) => {
-            return txFilter === undefined || x.type === txFilter
-          })
-          .slice(ITEMS_PER_INFO_TABLE_PAGE * (page - 1), page * ITEMS_PER_INFO_TABLE_PAGE)
+        .slice()
+        .sort((a, b) => {
+          if (a && b) {
+            return a[sortField as keyof Transaction] > b[sortField as keyof Transaction]
+              ? (sortDirection ? -1 : 1) * 1
+              : (sortDirection ? -1 : 1) * -1
+          }
+          return -1
+        })
+        .filter((x) => {
+          return txFilter === undefined || x.type === txFilter
+        })
+        .slice(ITEMS_PER_INFO_TABLE_PAGE * (page - 1), page * ITEMS_PER_INFO_TABLE_PAGE)
       : []
   }, [transactions, page, sortField, sortDirection, txFilter])
 
@@ -277,56 +276,56 @@ const TransactionTable: React.FC<{
         </Flex>
       </Flex>
 
-        <ResponsiveGrid style={{height: '80px', backgroundColor: "transparent"}}>
-          <Text color="rgba(82, 82, 99, 0.6)" fontSize="12px" bold textTransform="uppercase">
-            {t('Action')}
-          </Text>
-          <ClickableColumnHeader
-            color="rgba(82, 82, 99, 0.6)"
-            fontSize="12px"
-            bold
-            onClick={() => handleSort(SORT_FIELD.amountUSD)}
-            textTransform="uppercase"
-          >
-            {t('Total Value')} {arrow(SORT_FIELD.amountUSD)}
-          </ClickableColumnHeader>
-          <ClickableColumnHeader
-            color="rgba(82, 82, 99, 0.6)"
-            fontSize="12px"
-            bold
-            onClick={() => handleSort(SORT_FIELD.amountToken0)}
-            textTransform="uppercase"
-          >
-            {t('Token Amount')} {arrow(SORT_FIELD.amountToken0)}
-          </ClickableColumnHeader>
-          <ClickableColumnHeader
-            color="rgba(82, 82, 99, 0.6)"
-            fontSize="12px"
-            bold
-            onClick={() => handleSort(SORT_FIELD.amountToken1)}
-            textTransform="uppercase"
-          >
-            {t('Token Amount')} {arrow(SORT_FIELD.amountToken1)}
-          </ClickableColumnHeader>
-          <ClickableColumnHeader
-            color="rgba(82, 82, 99, 0.6)"
-            fontSize="12px"
-            bold
-            onClick={() => handleSort(SORT_FIELD.sender)}
-            textTransform="uppercase"
-          >
-            {t('Account')} {arrow(SORT_FIELD.sender)}
-          </ClickableColumnHeader>
-          <ClickableColumnHeader
-            color="rgba(82, 82, 99, 0.6)"
-            fontSize="12px"
-            bold
-            onClick={() => handleSort(SORT_FIELD.timestamp)}
-            textTransform="uppercase"
-          >
-            {t('Time')} {arrow(SORT_FIELD.timestamp)}
-          </ClickableColumnHeader>
-        </ResponsiveGrid>
+      <ResponsiveGrid style={{height: '80px', backgroundColor: "transparent"}}>
+        <Text color="rgba(82, 82, 99, 0.6)" fontSize="12px" bold textTransform="uppercase">
+          {t('Action')}
+        </Text>
+        <ClickableColumnHeader
+          color="rgba(82, 82, 99, 0.6)"
+          fontSize="12px"
+          bold
+          onClick={() => handleSort(SORT_FIELD.amountUSD)}
+          textTransform="uppercase"
+        >
+          {t('Total Value')} {arrow(SORT_FIELD.amountUSD)}
+        </ClickableColumnHeader>
+        <ClickableColumnHeader
+          color="rgba(82, 82, 99, 0.6)"
+          fontSize="12px"
+          bold
+          onClick={() => handleSort(SORT_FIELD.amountToken0)}
+          textTransform="uppercase"
+        >
+          {t('Token Amount')} {arrow(SORT_FIELD.amountToken0)}
+        </ClickableColumnHeader>
+        <ClickableColumnHeader
+          color="rgba(82, 82, 99, 0.6)"
+          fontSize="12px"
+          bold
+          onClick={() => handleSort(SORT_FIELD.amountToken1)}
+          textTransform="uppercase"
+        >
+          {t('Token Amount')} {arrow(SORT_FIELD.amountToken1)}
+        </ClickableColumnHeader>
+        <ClickableColumnHeader
+          color="rgba(82, 82, 99, 0.6)"
+          fontSize="12px"
+          bold
+          onClick={() => handleSort(SORT_FIELD.sender)}
+          textTransform="uppercase"
+        >
+          {t('Account')} {arrow(SORT_FIELD.sender)}
+        </ClickableColumnHeader>
+        <ClickableColumnHeader
+          color="rgba(82, 82, 99, 0.6)"
+          fontSize="12px"
+          bold
+          onClick={() => handleSort(SORT_FIELD.timestamp)}
+          textTransform="uppercase"
+        >
+          {t('Time')} {arrow(SORT_FIELD.timestamp)}
+        </ClickableColumnHeader>
+      </ResponsiveGrid>
       <TableWrapper>
         {transactions ? (
           <>

@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { createReducer } from '@reduxjs/toolkit'
-import { InfoState } from './types'
+import {InfoState, TokenBurnFields} from './types'
 import {
   updateProtocolData,
   updateProtocolChartData,
@@ -14,7 +14,7 @@ import {
   addTokenPoolAddresses,
   updateTokenChartData,
   updateTokenPriceData,
-  updateTokenTransactions,
+  updateTokenTransactions, typeTokenBurnInput,
 } from './actions'
 
 const initialState: InfoState = {
@@ -25,6 +25,10 @@ const initialState: InfoState = {
   },
   pools: { byAddress: {} },
   tokens: { byAddress: {} },
+  burns: {
+    independentField: TokenBurnFields.TOKEN_PERCENT,
+    typedValue: '0',
+  }
 }
 
 export default createReducer(initialState, (builder) =>
@@ -108,5 +112,11 @@ export default createReducer(initialState, (builder) =>
           },
         }
       },
-    ),
+    )
+    .addCase(typeTokenBurnInput, (state, { payload: { field, typedValue } }) => {
+      state.burns = {
+        independentField: field,
+        typedValue,
+      }
+    }),
 )

@@ -1,5 +1,4 @@
 // import invariant from 'tiny-invariant'
-import { Token } from '@pancakeswap/sdk'
 import { InsufficientInputAmountError, InsufficientReservesError } from '..'
 import { ChainId, ONE, TradeType, ZERO } from '../constants'
 import { sortedInsert } from '../utils'
@@ -12,7 +11,7 @@ import { TokenAmount } from './fractions/tokenAmount'
 import { Pair } from './pair'
 import { Route } from './route'
 // import { currencyEquals, Token, WETH } from './token'
-import { WETH } from './token'
+import { Token, WETH } from './token'
 
 /**
  * Returns the percent difference between the mid price and the execution price, i.e. price impact.

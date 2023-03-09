@@ -11,11 +11,9 @@ import {
   addSerializedPair,
   addSerializedToken,
   FarmStakedOnly,
-  muteAudio,
   removeSerializedToken,
   SerializedPair,
   toggleTheme as toggleThemeAction,
-  unmuteAudio,
   updateUserDeadline,
   updateUserExpertMode,
   updateUserFarmStakedOnly,
@@ -38,21 +36,6 @@ import {
   setChartViewMode,
 } from '../actions'
 import { deserializeToken, GAS_PRICE_GWEI, serializeToken } from './helpers'
-
-export function useAudioModeManager(): [boolean, () => void] {
-  const dispatch = useDispatch<AppDispatch>()
-  const audioPlay = useSelector<AppState, AppState['user']['audioPlay']>((state) => state.user.audioPlay)
-
-  const toggleSetAudioMode = useCallback(() => {
-    if (audioPlay) {
-      dispatch(muteAudio())
-    } else {
-      dispatch(unmuteAudio())
-    }
-  }, [audioPlay, dispatch])
-
-  return [audioPlay, toggleSetAudioMode]
-}
 
 export function usePhishingBannerManager(): [boolean, () => void] {
   const dispatch = useDispatch<AppDispatch>()
@@ -382,7 +365,7 @@ export function usePairAdder(): (pair: Pair) => void {
  * @param tokenB the other token
  */
 export function toV2LiquidityToken([tokenA, tokenB]: [Token, Token]): Token {
-  return new Token(tokenA.chainId, Pair.getAddress(tokenA, tokenB), 18, 'Cake-LP', 'Pancake LPs')
+  return new Token(tokenA.chainId, Pair.getAddress(tokenA, tokenB), 18, 'TBCC-LP', 'TBCC Finance LPs')
 }
 
 /**

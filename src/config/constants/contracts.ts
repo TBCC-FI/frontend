@@ -8,8 +8,8 @@ export default {
     56: '0x6ab8463a4185b80905e05a9ff80a2d6b714b9e95',
   },
   lotteryV2: {
-    97: '0x1dd5b10d8043fc3aae288e04f219ac5a5e5232c2',
-    56: '0x3a6b6ca1d3A49FFf1Bf65300eb8F4F6909365634',
+    97: '0x106b1f4a05f3a6bf80ebaa46e9725b7a89d23c8a',
+    56: '0x106b1f4a05f3a6bf80ebaa46e9725b7a89d23c8a',
   },
   ico: {
     97: '0x9849D875be53f22fDD2B965aFce4d5EE41ADD501',
@@ -106,5 +106,9 @@ export default {
   nftTBCC: {
     56: '0x7d87c63e4b71a53db71c9179623837fac2964a39',
     97: '0x7d87c63e4b71a53db71c9179623837fac2964a39',
+  },
+  nftTDA: {
+    56: '0x7097b965E3540Ab3B595855e57A4D584Ef5332b5',
+    97: '0x7097b965E3540Ab3B595855e57A4D584Ef5332b5',
   },
 }

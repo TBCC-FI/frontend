@@ -12,7 +12,8 @@ interface Props {
   login: Login
   onDismiss?: () => void
   displayCount?: number
-  t: (key: string) => string
+  t: (key: string) => string,
+  setModalisOpen?: (e) => void
 }
 
 const WalletWrapper = styled(Box)`
@@ -45,23 +46,28 @@ const getPreferredConfig = (walletConfig: Config[]) => {
   ]
 }
 
-const ConnectModal: React.FC<Props> = ({ login, onDismiss = () => null, displayCount = 3, t }) => {
+const ConnectModal: React.FC<Props> = ({ login, onDismiss = () => null, displayCount = 3, t , setModalisOpen}) => {
   const [showMore, setShowMore] = useState(false)
   const sortedConfig = getPreferredConfig(config)
   const displayListConfig = showMore ? sortedConfig : sortedConfig.slice(0, displayCount)
   const { isMobile } = useMatchBreakpoints()
 
+  const onModalClose = () => {
+    onDismiss()
+    setModalisOpen(false)
+  }
+
   return (
     <Modal
       title={t('Connect Wallet')}
-      onDismiss={onDismiss}
+      onDismiss={setModalisOpen ? onModalClose : onDismiss}
       minWidth={isMobile ? 'calc(100% - 30px)' : '450px' }
     >
       <WalletWrapper maxHeight="453px" overflowY="auto">
         <Grid gridTemplateColumns="1fr 1fr">
           {displayListConfig.map((wallet) => (
             <Box key={wallet.title}>
-              <WalletCard walletConfig={wallet} login={login} onDismiss={onDismiss} />
+              <WalletCard walletConfig={wallet} login={login} onDismiss={setModalisOpen ? onModalClose : onDismiss} />
             </Box>
           ))}
           {!showMore && <MoreWalletCard t={t} onClick={() => setShowMore(true)} />}

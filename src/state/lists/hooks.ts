@@ -1,12 +1,13 @@
-import { ChainId, Token } from '@pancakeswap/sdk'
 import { Tags, TokenInfo, TokenList } from '@uniswap/token-lists'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { DEFAULT_LIST_OF_LISTS } from 'config/constants/lists'
+import { ChainId, Token } from '../../sdk'
 import { AppState } from '../index'
 import DEFAULT_TOKEN_LIST from '../../config/constants/tokenLists/pancake-default.tokenlist.json'
 import { UNSUPPORTED_LIST_URLS } from '../../config/constants/lists'
 import UNSUPPORTED_TOKEN_LIST from '../../config/constants/tokenLists/pancake-unsupported.tokenlist.json'
+import useUserAddedTokens from "../user/hooks/useUserAddedTokens";
 
 type TagDetails = Tags[keyof Tags]
 export interface TagInfo extends TagDetails {
@@ -61,7 +62,6 @@ const listCache: WeakMap<TokenList, TokenAddressMap> | null =
 export function listToTokenMap(list: TokenList): TokenAddressMap {
   const result = listCache?.get(list)
   if (result) return result
-
   const map = list.tokens.reduce<TokenAddressMap>(
     (tokenMap, tokenInfo) => {
       const tags: TagInfo[] =
@@ -72,6 +72,7 @@ export function listToTokenMap(list: TokenList): TokenAddressMap {
           })
           ?.filter((x): x is TagInfo => Boolean(x)) ?? []
       const token = new WrappedTokenInfo(tokenInfo, tags)
+
       if (tokenMap[token.chainId][token.address] !== undefined) throw Error('Duplicate tokens.')
       return {
         ...tokenMap,
@@ -150,8 +151,29 @@ export function useInactiveListUrls(): string[] {
 
 // get all the tokens from active lists, combine with local default tokens
 export function useCombinedActiveList(): TokenAddressMap {
+  const userAddedTokens: Token[] = useUserAddedTokens()
+  const userTokensInfo: TokenInfo[] = userAddedTokens.map((token) => {
+    return {
+      chainId: token.chainId,
+      address: token.address,
+      name: token.name,
+      decimals: token.decimals,
+      symbol: token.symbol
+    }
+  })
+  const userTokensMap = Object.assign(listToTokenMap({
+    name: 'TBCC Finance User List',
+    timestamp: '2022-05-06T00:00:00Z',
+    version: {
+      major: 1,
+      minor: 0,
+      patch: 0,
+    },
+    tokens: userTokensInfo
+  }))
   const defaultTokenMap = listToTokenMap(DEFAULT_TOKEN_LIST)
-  return defaultTokenMap
+
+  return combineMaps(defaultTokenMap, userTokensMap)
 }
 
 // all tokens from inactive lists

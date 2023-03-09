@@ -558,6 +558,28 @@ export interface UserRound {
 
 export type UserTicketsResponse = [ethers.BigNumber[], number[], boolean[]]
 
+export interface NFTTDAState {
+  totalTokens: string
+  totalSupply: string
+  busdPrice: string
+}
+
+export interface NFTState {
+  nftTDAData: NFTTDAState
+}
+
+export interface NFTTDAResponse {
+  totalTokens: SerializedBigNumber
+  totalSupply: SerializedBigNumber
+  busdPrice: SerializedBigNumber
+}
+
+export interface NFTTDAGraphEntity {
+  totalTokens: SerializedBigNumber
+  totalSupply: SerializedBigNumber
+  busdPrice: SerializedBigNumber
+}
+
 // Global state
 
 export interface State {
@@ -570,4 +592,5 @@ export interface State {
   teams: TeamsState
   voting: VotingState
   lottery: LotteryState
+  nft: NFTState
 }

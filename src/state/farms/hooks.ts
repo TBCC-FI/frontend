@@ -10,6 +10,8 @@ import useRefresh from 'hooks/useRefresh'
 import { deserializeToken } from 'state/user/hooks/helpers'
 import { fetchFarmsPublicDataAsync, fetchFarmUserDataAsync, nonArchivedFarms } from '.'
 import { State, SerializedFarm, DeserializedFarmUserData, DeserializedFarm, DeserializedFarmsState } from '../types'
+import tokens from "../../config/constants/tokens";
+import useBUSDPrice from "../../hooks/useBUSDPrice";
 
 const deserializeFarmUserData = (farm: SerializedFarm): DeserializedFarmUserData => {
   return {
@@ -154,4 +156,16 @@ export const usePriceCakeBusd = (): BigNumber => {
   }, [cakePriceBusdAsString])
 
   return cakePriceBusd
+}
+
+export const usePriceTBCCBusd = (): BigNumber => {
+  const tbccBnbFarm = useBUSDPrice(tokens.tbcc)
+
+  const tbccPriceBusdAsString = tbccBnbFarm ? tbccBnbFarm.toFixed(9) : 0;
+
+  const tbccPriceBusd = useMemo(() => {
+    return new BigNumber(tbccPriceBusdAsString)
+  }, [tbccPriceBusdAsString])
+
+  return tbccPriceBusd
 }

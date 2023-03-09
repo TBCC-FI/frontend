@@ -1,6 +1,4 @@
 import React, { CSSProperties } from 'react'
-import { Token } from '../../sdk'
-import { Button, Text, CheckmarkCircleIcon } from '../../uikit'
 import { AutoRow, RowFixed } from 'components/Layout/Row'
 import { AutoColumn } from 'components/Layout/Column'
 import CurrencyLogo from 'components/Logo/CurrencyLogo'
@@ -10,9 +8,10 @@ import { useCombinedInactiveList } from 'state/lists/hooks'
 import styled from 'styled-components'
 import { useIsUserAddedToken, useIsTokenActive } from 'hooks/Tokens'
 import { useTranslation } from 'contexts/Localization'
+import { Token } from '../../sdk'
+import { Button, Text, CheckmarkCircleIcon } from '../../uikit'
 
 const TokenSection = styled.div<{ dim?: boolean }>`
-  padding: 4px 20px;
   height: 56px;
   display: grid;
   grid-template-columns: auto minmax(auto, 1fr) auto;
@@ -29,12 +28,15 @@ const CheckIcon = styled(CheckmarkCircleIcon)`
   stroke: ${({ theme }) => theme.colors.success};
 `
 
-const NameOverflow = styled.div`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 140px;
-  font-size: 12px;
+const StyledImportBtn = styled(Button)`
+  background: linear-gradient(77.9deg,#DB00FF -3.83%,#2C5EE0 110.36%);
+  border-radius: 4px;
+  padding: 12px 20px;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 16px;
+  height: 40px;
 `
 
 export default function ImportRow({
@@ -68,10 +70,8 @@ export default function ImportRow({
       <CurrencyLogo currency={token} size="24px" style={{ opacity: dim ? '0.6' : '1' }} />
       <AutoColumn gap="4px" style={{ opacity: dim ? '0.6' : '1' }}>
         <AutoRow>
-          <Text>{token.symbol}</Text>
-          <Text color="textDisabled" ml="8px">
-            <NameOverflow title={token.name}>{token.name}</NameOverflow>
-          </Text>
+          <Text fontSize='14px' fontWeight='600' color='#505050'>{token.name}</Text>
+          <Text ml="8px" fontSize='14px' fontWeight='600' color='#505050'>({token.symbol})</Text>
         </AutoRow>
         {list && list.logoURI && (
           <RowFixed>
@@ -83,7 +83,7 @@ export default function ImportRow({
         )}
       </AutoColumn>
       {!isActive && !isAdded ? (
-        <Button
+        <StyledImportBtn
           width="fit-content"
           onClick={() => {
             if (setImportToken) {
@@ -93,7 +93,7 @@ export default function ImportRow({
           }}
         >
           {t('Import')}
-        </Button>
+        </StyledImportBtn>
       ) : (
         <RowFixed style={{ minWidth: 'fit-content' }}>
           <CheckIcon />

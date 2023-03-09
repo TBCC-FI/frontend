@@ -18,10 +18,9 @@ interface TopTokensResponse {
 const fetchTopTokens = async (timestamp24hAgo: number): Promise<string[]> => {
   try {
     const query = gql`
-      query topTokens($blacklist: [String!], $timestamp24hAgo: Int) {
+      query topTokens {
         tokenDayDatas(
-          first: 30
-          where: { dailyTxns_gt: 300, id_not_in: $blacklist, date_gt: $timestamp24hAgo }
+          first: 200
           orderBy: dailyVolumeUSD
           orderDirection: desc
         ) {
@@ -30,13 +29,34 @@ const fetchTopTokens = async (timestamp24hAgo: number): Promise<string[]> => {
       }
     `
     const data = await request<TopTokensResponse>(INFO_CLIENT, query, { blacklist: TOKEN_BLACKLIST, timestamp24hAgo })
-    // tokenDayDatas id has compound id "0xTOKENADDRESS-NUMBERS", extracting token address with .split('-')
     return data.tokenDayDatas.map((t) => t.id.split('-')[0])
   } catch (error) {
     console.error('Failed to fetch top tokens', error)
     return []
   }
 }
+// const fetchTopTokens = async (timestamp24hAgo: number): Promise<string[]> => {
+//   try {
+//     const query = gql`
+//       query topTokens($blacklist: [String!], $timestamp24hAgo: Int) {
+//         tokenDayDatas(
+//           first: 30
+//           where: { dailyTxns_gt: 300, id_not_in: $blacklist, date_gt: $timestamp24hAgo }
+//           orderBy: dailyVolumeUSD
+//           orderDirection: desc
+//         ) {
+//           id
+//         }
+//       }
+//     `
+//     const data = await request<TopTokensResponse>(INFO_CLIENT, query, { blacklist: TOKEN_BLACKLIST, timestamp24hAgo })
+//     // tokenDayDatas id has compound id "0xTOKENADDRESS-NUMBERS", extracting token address with .split('-')
+//     return data.tokenDayDatas.map((t) => t.id.split('-')[0])
+//   } catch (error) {
+//     console.error('Failed to fetch top tokens', error)
+//     return []
+//   }
+// }
 
 /**
  * Fetch top addresses by volume

@@ -13,7 +13,7 @@ const config: (t: ContextApi['t']) => ConfigMenuItemsType[] = (t) => [
   },
   {
     label: t('Mint'),
-    href: PATHS.MINT,
+    href: PATHS.NFT,
     icon: 'Dashboard',
     items: [],
   },
@@ -28,7 +28,38 @@ const config: (t: ContextApi['t']) => ConfigMenuItemsType[] = (t) => [
     href: PATHS.LIQUIDITY,
     icon: 'Liquidity',
     items: []
-  }
+  },
+  {
+    label: t('Analytics'),
+    href: PATHS.ANALYTICS,
+    icon: 'Analytics',
+    items: []
+  },
+  {
+    label: t('Burning Hall'),
+    href: PATHS.BURN,
+    icon: 'Burn',
+    items: [
+      {
+        label: t('Burning Hall'),
+        href: PATHS.BURN_RATING,
+        icon: 'Burn',
+        items: []
+      }
+    ]
+  },
+  {
+    label: t('Lottery'),
+    href: PATHS.LOTTERY,
+    icon: 'Launchpools',
+    items: []
+  },
+  // {
+  //   label: t('Farms'),
+  //   href: PATHS.FARMS,
+  //   icon: 'Farms',
+  //   items: []
+  // },
 ]
 
 export default config

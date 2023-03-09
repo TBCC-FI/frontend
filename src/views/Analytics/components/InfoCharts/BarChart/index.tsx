@@ -8,18 +8,18 @@ import { useTranslation } from 'contexts/Localization'
 export type LineChartProps = {
   data: any[]
   height?: string
-  chartHeight?: string
+  // chartHeight?: string
   setHoverValue?: Dispatch<SetStateAction<number | undefined>> // used for value on hover
   setHoverDate?: Dispatch<SetStateAction<string | undefined>> // used for label of value
 } & React.HTMLAttributes<HTMLDivElement>
 
 const CustomBar = ({
-                     x,
-                     y,
-                     width,
-                     height,
-                     fill,
-                   }: {
+ x,
+ y,
+ width,
+ height,
+ fill,
+}: {
   x: number
   y: number
   width: number
@@ -67,6 +67,12 @@ const Chart = ({ data, setHoverValue, setHoverDate }: LineChartProps) => {
           setHoverValue(undefined)
         }}
       >
+        <defs>
+          <linearGradient id="bar_gradient" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="-12.45%" stopColor='rgb(219, 0, 255)' stopOpacity={1} />
+            <stop offset="105.38%" stopColor='rgb(44, 94, 224)' stopOpacity={1} />
+          </linearGradient>
+        </defs>
         <XAxis
           dataKey="time"
           axisLine={false}
@@ -80,11 +86,10 @@ const Chart = ({ data, setHoverValue, setHoverDate }: LineChartProps) => {
           scale="linear"
           axisLine={false}
           tickLine={false}
-          color='#4E89E3'
           fontSize="12px"
           tickFormatter={(val) => `$${formatAmount(val)}`}
           orientation="right"
-          tick={{ dx: 10, fill: theme.colors.textSubtle }}
+          tick={{ dx: 10, fill: 'rgba(255, 255, 255, 0.4)' }}
         />
         <Tooltip
           cursor={{ fill: theme.colors.backgroundDisabled }}
@@ -100,9 +105,8 @@ const Chart = ({ data, setHoverValue, setHoverDate }: LineChartProps) => {
         />
         <Bar
           dataKey="value"
-          fill={theme.colors.primary}
           shape={(props) => (
-            <CustomBar height={props.height} width={props.width} x={props.x} y={props.y} fill='#4E89E3' />
+            <CustomBar height={props.height} width={props.width} x={props.x} y={props.y} fill="url(#bar_gradient)" />
           )}
         />
       </BarChart>

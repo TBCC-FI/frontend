@@ -1,5 +1,4 @@
 import React, { memo, useCallback, useMemo, useState, useEffect } from 'react'
-import { Button, Text, CheckmarkIcon, CogIcon, Input, Toggle, LinkExternal, useTooltip } from '../../uikit'
 import { useDispatch, useSelector } from 'react-redux'
 import styled from 'styled-components'
 import { TokenList, Version } from '@uniswap/token-lists'
@@ -7,6 +6,7 @@ import Card from 'components/Card'
 import { UNSUPPORTED_LIST_URLS } from 'config/constants/lists'
 import { parseENSAddress } from 'utils/ENS/parseENSAddress'
 import { useTranslation } from 'contexts/Localization'
+import { Button, Text, CheckmarkIcon, CogIcon, Input, Toggle, LinkExternal, useTooltip } from '../../uikit'
 import useFetchListCallback from '../../hooks/useFetchListCallback'
 
 import { AppDispatch, AppState } from '../../state'

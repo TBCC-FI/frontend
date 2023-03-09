@@ -2,18 +2,29 @@ import React, { useState } from 'react'
 import { AutoColumn } from 'components/Layout/Column'
 import { useAddUserToken } from 'state/user/hooks'
 import { getBscScanLink } from 'utils'
+import styled from "styled-components";
 import truncateHash from 'utils/truncateHash'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useCombinedInactiveList } from 'state/lists/hooks'
-import { ListLogo } from 'components/Logo'
 import { useTranslation } from 'contexts/Localization'
-import { Button, Text, ErrorIcon, Flex, Message, Checkbox, Link, Tag, Grid } from '../../uikit'
+import { Button, Text, Flex, Message, Toggle, Link, Grid } from '../../uikit'
 import { Token, Currency } from '../../sdk'
 
 interface ImportProps {
   tokens: Token[]
   handleCurrencySelect?: (currency: Currency) => void
 }
+
+const StyledImportBtn = styled(Button)`
+  background: linear-gradient(77.9deg,#DB00FF -3.83%,#2C5EE0 110.36%);
+  border-radius: 4px;
+  padding: 12px 20px;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 16px;
+  height: 40px;
+`
 
 function ImportToken({ tokens, handleCurrencySelect }: ImportProps) {
   const { chainId } = useActiveWeb3React()
@@ -46,22 +57,13 @@ function ImportToken({ tokens, handleCurrencySelect }: ImportProps) {
         return (
           <Grid key={token.address} gridTemplateRows="1fr 1fr 1fr" gridGap="4px">
             {list !== undefined ? (
-              <Tag
-                variant="success"
-                outline
-                scale="sm"
-                startIcon={list.logoURI && <ListLogo logoURI={list.logoURI} size="12px" />}
-              >
-                {t('via')} {list.name}
-              </Tag>
+              <Text color="#a5a5a4">{t('via')} {list.name}</Text>
             ) : (
-              <Tag variant="failure" outline scale="sm" startIcon={<ErrorIcon color="failure" />}>
-                {t('Unknown Source')}
-              </Tag>
+              <Text color="#a5a5a4">{t('Unknown Source')}</Text>
             )}
             <Flex alignItems="center">
-              <Text mr="8px">{token.name}</Text>
-              <Text>({token.symbol})</Text>
+              <Text fontSize='14px' fontWeight='600' color='#505050'>{token.name}</Text>
+              <Text ml="8px" fontSize='14px' fontWeight='600' color='#505050'>({token.symbol})</Text>
             </Flex>
             {chainId && (
               <Flex justifyContent="space-between" width="100%">
@@ -75,20 +77,19 @@ function ImportToken({ tokens, handleCurrencySelect }: ImportProps) {
         )
       })}
 
-      <Flex justifyContent="space-between" alignItems="center">
+      <Flex justifyContent="space-between" alignItems="center" mb="15px">
         <Flex alignItems="center" onClick={() => setConfirmed(!confirmed)}>
-          <Checkbox
-            scale="sm"
+          <Toggle
+            scale="md"
             name="confirmed"
             type="checkbox"
             checked={confirmed}
             onChange={() => setConfirmed(!confirmed)}
+            className="token-dismiss-toogle"
           />
-          <Text ml="8px" style={{ userSelect: 'none' }}>
-            {t('I understand')}
-          </Text>
+          <Text fontSize="14px" lineHeight="16px" color="#505050">{t('I understand')}</Text>
         </Flex>
-        <Button
+        <StyledImportBtn
           variant="danger"
           disabled={!confirmed}
           onClick={() => {
@@ -100,7 +101,7 @@ function ImportToken({ tokens, handleCurrencySelect }: ImportProps) {
           className=".token-dismiss-button"
         >
           {t('Import')}
-        </Button>
+        </StyledImportBtn>
       </Flex>
     </AutoColumn>
   )

@@ -1,6 +1,6 @@
-import { Currency, currencyEquals, ETHER, WETH } from '@pancakeswap/sdk'
 import { useMemo } from 'react'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { Currency, currencyEquals, ETHER, WETH } from '../sdk'
 import { tryParseAmount } from '../state/swap/hooks'
 import { useTransactionAdder } from '../state/transactions/hooks'
 import { useCurrencyBalance } from '../state/wallet/hooks'

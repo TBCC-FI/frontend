@@ -77,10 +77,6 @@ const SettingsModal: React.FC<InjectedModalProps> = ({ onDismiss }) => {
   //   }
   // }
 
-  if (isMobile) {
-    setSingleHopOnly(true)
-  }
-
   return (
     <StyledModal
       title={t('Settings')}

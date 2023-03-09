@@ -25,6 +25,7 @@ const Liquidity = ({ setExtended }) => {
 
 	// fetch the user's balances of all tracked V2 LP tokens
 	const trackedTokenPairs = useTrackedTokenPairs()
+
 	const tokenPairsWithLiquidityTokens = useMemo(
 		() => trackedTokenPairs.map((tokens) => ({ liquidityToken: toV2LiquidityToken(tokens), tokens })),
 		[trackedTokenPairs],
@@ -33,6 +34,7 @@ const Liquidity = ({ setExtended }) => {
 		() => tokenPairsWithLiquidityTokens.map((tpwlt) => tpwlt.liquidityToken),
 		[tokenPairsWithLiquidityTokens],
 	)
+
 	const [v2PairsBalances, fetchingV2PairBalances] = useTokenBalancesWithLoadingIndicator(
 		account ?? undefined,
 		liquidityTokens,
@@ -106,7 +108,7 @@ const Liquidity = ({ setExtended }) => {
 					{renderBody()}
 					<Link to={PATHS.ADD_LIQUIDITY} style={{ width: '100%' }}>
 						<StyledBtn style={{ width: '100%' }}>
-							{t('+ Add Liquidity')}
+							+ {t('Add Liquidity')}
 						</StyledBtn>
 					</Link>
 				</MainCard>

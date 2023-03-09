@@ -1,5 +1,5 @@
-import { ChainId, Token } from '@pancakeswap/sdk'
 import { serializeToken } from 'state/user/hooks/helpers'
+import { ChainId, Token } from '../../sdk'
 import { SerializedToken } from './types'
 
 const { MAINNET, TESTNET } = ChainId

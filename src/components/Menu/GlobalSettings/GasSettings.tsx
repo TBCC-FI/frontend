@@ -46,7 +46,7 @@ const GasSettings = () => {
           isActive={gasPrice === GAS_PRICE_GWEI.default}
           isMobile={isMobile}
         >
-          {t('Standard (3)')}
+          {t('Standard')} (3)
         </SelectButton>
         <SelectButton
           onClick={() => {
@@ -55,7 +55,7 @@ const GasSettings = () => {
           isActive={gasPrice === GAS_PRICE_GWEI.fast}
           isMobile={isMobile}
         >
-          {t('Fast (5)')}
+          {t('Fast')} (5)
         </SelectButton>
         <SelectButton
           onClick={() => {
@@ -64,7 +64,7 @@ const GasSettings = () => {
           isActive={gasPrice === GAS_PRICE_GWEI.instant}
           isMobile={isMobile}
         >
-          {t('Instant (6)')}
+          {t('Instant')} (6)
         </SelectButton>
       </ButtonContainer>
     </Flex>

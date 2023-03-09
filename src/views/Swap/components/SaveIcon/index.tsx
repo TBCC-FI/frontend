@@ -1,12 +1,12 @@
 import React, { HTMLAttributes } from 'react'
 import styled from 'styled-components'
 import { StarFillIcon, StarLineIcon } from '../../../../uikit'
-import useTheme from 'hooks/useTheme'
 
 const HoverIcon = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
   :hover {
     cursor: pointer;
     opacity: 0.6;
@@ -14,13 +14,12 @@ const HoverIcon = styled.div`
 `
 
 const SaveIcon: React.FC<{ fill: boolean } & HTMLAttributes<HTMLDivElement>> = ({ fill = false, ...rest }) => {
-  const { theme } = useTheme()
   return (
     <HoverIcon {...rest}>
       {fill ? (
-        <StarFillIcon stroke={theme.colors.warning} color={theme.colors.warning} />
+        <StarFillIcon  color="orange" />
       ) : (
-        <StarLineIcon stroke={theme.colors.textDisabled} />
+        <StarLineIcon color="#ffff" />
       )}
     </HoverIcon>
   )

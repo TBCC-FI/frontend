@@ -1,5 +1,5 @@
 import { createAction } from '@reduxjs/toolkit'
-import { Transaction } from 'state/info/types'
+import {TokenBurnFields, Transaction} from 'state/info/types'
 import { ProtocolData, TokenData, PoolData, ChartEntry, PriceChartEntry } from './types'
 
 export const updateProtocolData = createAction<{ protocolData: ProtocolData }>('info/protocol/updateProtocolData')
@@ -36,3 +36,5 @@ export const updateTokenPriceData = createAction<{
   priceData?: PriceChartEntry[]
   oldestFetchedTimestamp: number
 }>('info/tokens/updateTokenPriceData')
+
+export const typeTokenBurnInput = createAction<{ field: TokenBurnFields; typedValue: string }>('info/burns/typeTokenBurnInput')

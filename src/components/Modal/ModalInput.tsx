@@ -1,9 +1,9 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Text, Button, Input, InputProps, Flex, Link } from '../../uikit'
 import { useTranslation } from 'contexts/Localization'
 import { parseUnits } from 'ethers/lib/utils'
 import { formatBigNumber } from 'utils/formatBalance'
+import { Text, Button, Input, InputProps, Flex, Link } from '../../uikit'
 
 interface ModalInputProps {
   max: string

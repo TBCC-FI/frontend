@@ -7,14 +7,14 @@ export interface PercentProps extends TextProps {
 
 const Percent: React.FC<PercentProps> = ({ value, ...rest }) => {
   if (!value || Number.isNaN(value)) {
-    return <Text {...rest}>-</Text>
+    return <Text {...rest}>+0.00%</Text>
   }
 
   const isNegative = value < 0
 
   return (
-    <Text {...rest} color={isNegative ? 'failure' : 'success'}>
-      {isNegative ? '↓' : '↑'}
+    <Text {...rest} color={isNegative ? '#F72F72' : '#56BCA0'}>
+      {isNegative ? '-' : '+'}
       {Math.abs(value).toFixed(2)}%
     </Text>
   )

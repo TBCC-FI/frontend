@@ -11,7 +11,7 @@ const Container = styled.div`
   min-height: 32px;
   position: relative;
   top: 0;
-  background: #EB2323;
+  background: #009688;
 `
 
 const Attention = () => {
@@ -21,7 +21,7 @@ const Attention = () => {
   return (
     <Container>
       <Text fontSize='14px' fontWeight='400' color='#FFF'>
-        {t('Attention this version is for developers! Do not use for exchange! For the preservation of coins the project is not responsible!')}
+        {t('The alpha version of TBCC FINANCE has been launched')}
       </Text>
     </Container>
   )

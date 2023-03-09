@@ -79,7 +79,64 @@ const GlobalStyle = createGlobalStyle`
         }
       }
     }
-}
+  }
+  .winnersSlider {
+    height: 75px;
+    
+    .swiper-slide {
+      width: fit-content !important;
+    }
+
+    .swiper-wrapper{
+      transition-timing-function : linear;
+    }
+  }
+  
+  .MobileWinnersSlider {
+    height: 115px;
+    width: 100vw;
+    padding-bottom: 50px;
+
+    & .swiper-pagination {
+      &-bullet {
+        width: 6px;
+        height: 6px;
+        background: #fff;
+        opacity: 0.6;
+        border-radius: 50%;
+
+        &-active {
+          opacity: 1;
+        }
+      }  
+    }
+  }
+  
+  .MobileTeamContainer {
+    width: 100%;
+    height: 460px;
+    & .swiper-wrapper{
+      display: flex;
+    }
+    
+    & .swiper-pagination {
+      width: 100vw;
+      height: 10px;
+      position: absolute;
+      &-bullet {
+        width: 6px;
+        height: 6px;
+        background: #fff;
+        opacity: 0.6;
+        border-radius: 50%;
+
+        &-active {
+          opacity: 1;
+        }
+      }
+    }
+  }
+
 `
 
 export default GlobalStyle

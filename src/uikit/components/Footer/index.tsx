@@ -14,7 +14,7 @@ import { footerAboutUsLinks, footerSupportLinks, socials } from './config'
 import { Text } from '../Text'
 import MobileFooter from './MobileFooter'
 
-const Footer = () => {
+const Footer: React.FC<{center?: boolean}> = ({center}) => {
 
   const { t } = useTranslation()
   const { isMobile, isTablet } = useMatchBreakpoints()
@@ -24,14 +24,14 @@ const Footer = () => {
     <>
       {isSmall
         ? <MobileFooter />
-        : 
-        <CustomContainer>
+        :
+        <CustomContainer center={center}>
         <FooterContainer>
           <FooterColumn>
             <Flex flexDirection='column'>
               <TbccTextIcon mb='10px' />
               <Text fontWeight='400' fontSize='14px' color='rgba(255, 255, 255, 0.3)'>
-                {t('© 2022 TBCC Labs')}
+                © 2023 TBCC Labs
               </Text>
             </Flex>
           </FooterColumn>
@@ -41,7 +41,7 @@ const Footer = () => {
             </FooterSectionsTitle>
             {footerAboutUsLinks.map((link) => {
               return (
-                <StyledLink href={link.href} key={link.label}>
+                <StyledLink href={link.href} key={link.label} target="_blank">
                   {t(link.label)}
                 </StyledLink>
               )
@@ -53,7 +53,7 @@ const Footer = () => {
             </FooterSectionsTitle>
             {footerSupportLinks.map((link) => {
               return (
-                <StyledLink href={link.href} key={link.label}>
+                <StyledLink href={link.href} key={link.label} target="_blank">
                   {t(link.label)}
                 </StyledLink>
               )
@@ -65,7 +65,7 @@ const Footer = () => {
             </FooterSectionsTitle>
             {socials.map((link) => {
               return (
-                <StyledLink href={link.href} key={link.label}>
+                <StyledLink href={link.href} key={link.label} target="_blank">
                   {t(link.label)}
                 </StyledLink>
               )

@@ -1,6 +1,6 @@
-import { Currency } from '@pancakeswap/sdk'
 import React from 'react'
 import { useFetchPairPrices } from 'state/swap/hooks'
+import { Currency } from '../../../../sdk'
 import BnbWbnbNotice from './BnbWbnbNotice'
 import { BNB_ADDRESS } from './constants'
 import NoChartAvailable from './NoChartAvailable'

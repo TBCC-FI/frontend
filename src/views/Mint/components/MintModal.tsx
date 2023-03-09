@@ -61,6 +61,8 @@ const SubText = styled.div`
     text-align: center;
 `
 export const StyledBtn = styled(Button)`
+    display: flex;
+    justify-content: center;
     background: linear-gradient(77.9deg, #DB00FF -3.83%, #2C5EE0 110.36%);
     border: none;
     box-shadow: none;
@@ -166,7 +168,7 @@ const MintModal: React.FC<InjectedModalProps> = ({ onDismiss }) => {
       },
       onSuccess: async ({ receipt }) => {
         totalSupply += 1;
-        toastSuccess(t('TBCC NFT was minted!'), <ToastDescriptionWithTx txHash={receipt.transactionHash} />)
+        toastSuccess(`${t('TBCC NFT was minted')}!`, <ToastDescriptionWithTx txHash={receipt.transactionHash} />)
       },
     })
 
@@ -242,7 +244,7 @@ const MintModal: React.FC<InjectedModalProps> = ({ onDismiss }) => {
 
   return (
     <StyledModal
-      title={t('Mint Now!')}
+      title={`${t('Mint Now')}!`}
       headerBackground="gradients.cardHeader"
       onDismiss={onDismiss}
       style={{ maxWidth: isMobile ? 'calc(100% - 30px)' : '550px' }}

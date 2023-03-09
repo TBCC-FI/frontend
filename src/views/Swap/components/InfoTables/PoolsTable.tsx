@@ -54,7 +54,7 @@ const LinkWrapper = styled(Link)`
   background: #FFFFFF;
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.02);
   border-radius: 4px;
-  
+
   :hover {
     cursor: pointer;
     opacity: 0.7;
@@ -117,7 +117,7 @@ const DataRow = ({ poolData, index, priceUSDTBCC, currentCurrency }: { poolData:
     <LinkWrapper key={index} to={`/pools/${poolData.address}`}>
       <ResponsiveGrid>
         <Flex alignItems="center">
-           <CurrencyLogo currency={poolCurrency.currencyAddress} size="32px" />
+          <CurrencyLogo currency={poolCurrency.currencyAddress} size="32px" />
           <Text ml="6px" fontSize="18px" color="#505050" fontWeight="500" lineHeight="20px" >
             {poolCurrency.currencyAddress?.symbol}
           </Text>

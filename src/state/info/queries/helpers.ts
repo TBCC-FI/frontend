@@ -1,9 +1,26 @@
 import { ONE_DAY_UNIX, PCS_V2_START } from 'config/constants/info'
 import { getUnixTime } from 'date-fns'
 import {ApiResponseTokenAnalyticsData, TransactionType} from 'state/info/types'
+import {gql, request} from "graphql-request";
 import { ChartEntry } from '../types'
-import { MintResponse, SwapResponse, BurnResponse, TokenDayData, PairDayData, PancakeDayData } from './types'
-import {CORS_URL} from "../../../config/constants/endpoints";
+import { MintResponse, SwapResponse, BurnResponse, TokenDayData, PairDayData, TBCCFinanceDayData } from './types'
+import {CORS_URL, INFO_CLIENT} from "../../../config/constants/endpoints";
+
+interface TokenFields {
+  id: string
+  symbol: string
+  name: string
+  derivedBNB: string // Price in BNB per token
+  derivedUSD: string // Price in USD per token
+  tradeVolumeUSD: string
+  totalTransactions: string
+  totalLiquidity: string
+}
+
+interface TokenMonthQueryResponse {
+  now: TokenFields[]
+  oneMonthAgo: TokenFields[]
+}
 
 export const mapMints = (mint: MintResponse) => {
   return {
@@ -53,7 +70,7 @@ export const mapSwaps = (swap: SwapResponse) => {
   }
 }
 
-export const mapDayData = (tokenDayData: TokenDayData | PancakeDayData): ChartEntry => ({
+export const mapDayData = (tokenDayData: TokenDayData | TBCCFinanceDayData): ChartEntry => ({
   date: tokenDayData.date,
   volumeUSD: parseFloat(tokenDayData.dailyVolumeUSD),
   liquidityUSD: parseFloat(tokenDayData.totalLiquidityUSD),
@@ -161,6 +178,49 @@ export const fetchAnalyticsData = async (): Promise<ApiResponseTokenAnalyticsDat
         total_supply: 0
       }
     }
+  }
+}
+
+/**
+ * Main token data to display on Token page
+ */
+const TOKEN_AT_BLOCK = (block: number | undefined, tokens: string[]) => {
+  const addressesString = `["${tokens.join('","')}"]`
+  const blockString = block ? `block: {number: ${block}}` : ``
+  return `tokens(
+      where: {id_in: ${addressesString}}
+      ${blockString}
+      orderBy: tradeVolumeUSD
+      orderDirection: desc
+    ) {
+      id
+      symbol
+      name
+      derivedBNB
+      derivedUSD
+      tradeVolumeUSD
+      totalTransactions
+      totalLiquidity
+    }
+  `
+}
+
+export const fetchTokenMonthData = async (
+  block30d: number,
+  tokenAddresses: string[],
+) => {
+  try {
+    const query = gql`
+      query tokens {
+        now: ${TOKEN_AT_BLOCK(null, tokenAddresses)}
+        oneMonthAgo: ${TOKEN_AT_BLOCK(block30d, tokenAddresses)}
+      }
+    `
+    const data = await request<TokenMonthQueryResponse>(INFO_CLIENT, query)
+    return { data, error: false }
+  } catch (error) {
+    console.error('Failed to fetch token data', error)
+    return { error: true }
   }
 }
 

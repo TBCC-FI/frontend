@@ -1,21 +1,24 @@
 import React, { CSSProperties, MutableRefObject, useCallback, useMemo } from 'react'
 import styled from 'styled-components'
 import { FixedSizeList } from 'react-window'
+import { wrappedCurrency } from 'utils/wrappedCurrency'
 import { LightGreyCard } from 'components/Card'
 import { useTranslation } from 'contexts/Localization'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
-import { Token } from '@pancakeswap/sdk'
 import {
   Currency,
   CurrencyAmount,
-  ETHER
+  ETHER,
+  Token
 } from '../../sdk'
 import { Text, useMatchBreakpoints } from '../../uikit'
 import { useCurrencyBalance } from '../../state/wallet/hooks'
+import { useAllInactiveTokens } from '../../hooks/Tokens'
 import Column from '../Layout/Column'
 import { RowFixed, RowBetween } from '../Layout/Row'
 import { CurrencyLogo } from '../Logo'
 import CircleLoader from '../Loader/CircleLoader'
+import ImportRow from './ImportRow'
 
 function currencyKey(currency: Currency): string {
   return currency instanceof Token ? currency.address : currency === ETHER ? 'ETHER' : ''
@@ -124,12 +127,18 @@ export default function CurrencyList({
   // otherCurrency,
   fixedListRef,
   breakIndex,
+  showImportView,
+  setImportToken,
+
 }: {
   height: number
   currencies: Currency[]
   onCurrencySelect: (currency: Currency) => void
   fixedListRef?: MutableRefObject<FixedSizeList | undefined>
   breakIndex: number | undefined
+  showImportView?: () => void
+  setImportToken?: (token: Token) => void
+
 }) {
   const itemData: (Currency | undefined)[] = useMemo(() => {
     let formatted: (Currency | undefined)[] = [Currency.ETHER, ...currencies]
@@ -139,7 +148,13 @@ export default function CurrencyList({
     return formatted
   }, [breakIndex, currencies])
 
+  const { chainId } = useActiveWeb3React()
+
   const { t } = useTranslation()
+
+  const inactiveTokens: {
+    [address: string]: Token
+  } = useAllInactiveTokens()
 
   const Row = useCallback(
     ({ data, index, style }) => {
@@ -147,6 +162,10 @@ export default function CurrencyList({
       // const isSelected = Boolean(selectedCurrency && currencyEquals(selectedCurrency, currency))
       // const otherSelected = Boolean(otherCurrency && currencyEquals(otherCurrency, currency))
       const handleSelect = () => onCurrencySelect(currency)
+
+      const token = wrappedCurrency(currency, chainId)
+
+      const showImport = inactiveTokens && token && Object.keys(inactiveTokens).includes(token.address)
 
       if (index === breakIndex || !data) {
         return (
@@ -160,6 +179,12 @@ export default function CurrencyList({
         )
       }
 
+      if (showImport && token) {
+        return (
+          <ImportRow style={style} token={token} showImportView={showImportView} setImportToken={setImportToken} dim />
+        )
+      }
+
       return (
         <CurrencyRow
           style={style}
@@ -168,7 +193,15 @@ export default function CurrencyList({
         />
       )
     },
-    [onCurrencySelect, breakIndex, t],
+    [
+      chainId,
+      inactiveTokens,
+      onCurrencySelect,
+      setImportToken,
+      showImportView,
+      breakIndex,
+      t
+    ],
   )
 
   const itemKey = useCallback((index: number, data: any) => currencyKey(data[index]), [])

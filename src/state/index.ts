@@ -10,6 +10,7 @@ import achievementsReducer from './achievements'
 import blockReducer from './block'
 import votingReducer from './voting'
 import lotteryReducer from './lottery'
+import nftReducer from './nft'
 import infoReducer from './info'
 import { updateVersion } from './global/actions'
 import user, { initialState as userInitialState } from './user/reducer'
@@ -33,6 +34,7 @@ const store = configureStore({
     teams: teamsReducer,
     voting: votingReducer,
     lottery: lotteryReducer,
+    nft: nftReducer,
     info: infoReducer,
 
     // Exchange

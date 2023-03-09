@@ -1,10 +1,9 @@
 // import invariant from 'tiny-invariant'
-import { Token } from '@pancakeswap/sdk'
 import { ChainId } from '../constants'
 
 // import { Currency, ETHER } from './currency'
 import { Currency } from './currency'
-import { WETH } from './token'
+import { Token, WETH } from './token'
 import { Pair } from './pair'
 import { Price } from './fractions/price'
 

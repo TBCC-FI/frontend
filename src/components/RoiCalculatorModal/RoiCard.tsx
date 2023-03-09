@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react'
 import styled from 'styled-components'
-import { Box, Flex, Text, Input, CheckmarkIcon, PencilIcon, IconButton } from '../../uikit'
 import { useTranslation } from 'contexts/Localization'
+import { Box, Flex, Text, Input, CheckmarkIcon, PencilIcon, IconButton } from '../../uikit'
 import { CalculatorMode, RoiCalculatorReducerState } from './useRoiCalculatorReducer'
 
 const MILLION = 1000000

@@ -9,4 +9,12 @@ export const PATHS = {
   REMOVE_LIQUIDITY: '/remove/:tokens',
   REMOVEAB_LIQUIDITY: '/remove/:currencyIdA/:currencyIdB',
   MINT: '/mint',
+  MINT_TBCC_NFT: '/mint/tbcc-nft-token',
+  ANALYTICS: '/analytics',
+  BURN: '/burn',
+  BURN_RATING: '/burn/rating',
+  LOTTERY: '/lottery',
+  FARMS: '/farms',
+  NFT: '/admin-nft',
+  TEAM:'/team'
 }

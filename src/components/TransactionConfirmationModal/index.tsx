@@ -1,10 +1,10 @@
 import React, { useCallback } from 'react'
-import { ChainId, Currency, Token } from '@pancakeswap/sdk'
 import styled from 'styled-components'
 import { registerToken } from 'utils/wallet'
 import { useTranslation } from 'contexts/Localization'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { wrappedCurrency } from 'utils/wrappedCurrency'
+import { ChainId, Currency, Token } from '../../sdk'
 import {
   Button,
   Text,

@@ -69,6 +69,10 @@ export const Handle = styled.div<HandleProps>`
       height: 40px;
     }
   }
+
+  &.token-dismiss-toogle {
+    background-color: #E7E8F4;
+  }
 `
 
 export const Input = styled.input<InputProps>`
@@ -88,6 +92,10 @@ export const Input = styled.input<InputProps>`
       @media screen and (max-width: 670px) {
         left: calc(100% - 150px);
       }
+    }
+
+    &.token-dismiss-toogle {
+      left: calc(100% - 196px);
     }
   }
 
@@ -123,6 +131,14 @@ const StyledToggle = styled.div<StyleToggleProps>`
     @media screen and (max-width: 670px) {
       width: 300px;
       height: 40px;
+    }
+  }
+
+  &.token-dismiss-toogle {
+    background: #E7E8F4!important;
+    
+    > div {
+      background: #ffffff!important;
     }
   }
 `

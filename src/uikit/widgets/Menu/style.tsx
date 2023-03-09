@@ -52,7 +52,7 @@ export const Wrapper = styled.div`
     left:0;
     z-index:10;
     height: 100vh;
-    width: 90px;
+    width: 250px;
     padding-top: 33px;
     padding-bottom: 33px;
 `
@@ -187,6 +187,7 @@ export const MobileContainer = styled.div<{ isOpen?: boolean }>`
     width: ${({ isOpen }) => isOpen ? '100vw' : '0px'};
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     transition: 300ms;
+    backdrop-filter: blur(5px);
 `
 export const MobileBackground = styled.div<{ isOpen?: boolean }>`
     position: fixed;

@@ -1,12 +1,12 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react'
 import styled from 'styled-components'
-import { Text, Flex, Box, Skeleton, useMatchBreakpoints, ArrowBackIcon, ArrowForwardIcon } from '../../../../uikit'
 import { TokenData } from 'state/info/types'
 import { Link } from 'react-router-dom'
 import { CurrencyLogo } from 'views/Swap/components/CurrencyLogo'
 import { formatAmount } from 'views/Swap/utils/formatInfoNumbers'
 import Percent from 'views/Swap/components/Percent'
 import { useTranslation } from 'contexts/Localization'
+import { Text, Flex, Box, Skeleton, useMatchBreakpoints, ArrowBackIcon, ArrowForwardIcon } from '../../../../uikit'
 import { ClickableColumnHeader, TableWrapper, PageButtons, Arrow, Break } from './shared'
 
 /**

@@ -3,116 +3,74 @@
 import React, { useCallback, useState, useMemo, useEffect } from 'react'
 import styled from 'styled-components'
 import { formatDistanceToNowStrict } from 'date-fns'
-import {space} from "styled-system";
 import { formatAmount } from 'views/Analytics/utils/formatInfoNumbers'
 import { getBscScanLink } from 'utils'
 import truncateHash from 'utils/truncateHash'
 import { Transaction, TransactionType } from 'state/info/types'
-import { ITEMS_PER_INFO_TABLE_PAGE } from 'config/constants/info'
 import { useTranslation } from 'contexts/Localization'
-import { ClickableColumnHeader, TableWrapper } from './shared'
-import {Text, Flex, Box, Skeleton, LinkExternal, RadioProps, useMatchBreakpoints} from "../../../../uikit";
+import {Break, ClickableColumnHeader, TableWrapper} from './shared'
+import {
+  Text,
+  Flex,
+  Box,
+  Skeleton,
+  LinkExternal,
+  useMatchBreakpoints,
+  Card,
+  Button
+} from "../../../../uikit";
 import PageSwitcher from "../PageSwitcher";
 
+const ResponsiveHeaderGrid = styled.div`
+  display: grid;
+  grid-gap: 1em;
+  align-items: center;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 
-const Wrapper = styled.div`
-  width: 100%;
+  padding: 0 10px;
+  margin-bottom: 10px;
+
+  grid-template-columns: 3fr repeat(5, 1.5fr);
+
+  @media screen and (max-width: 900px) {
+    width: 920px;
+    grid-template-columns: 1.5fr repeat(5, 1fr);
+  }
 `
 
 const ResponsiveGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   align-items: center;
-  grid-template-columns: 2fr 0.8fr repeat(4, 1fr);
-  padding: 0 24px;
-  
-  @media screen and (max-width: 940px) {
-    grid-template-columns: 2fr repeat(4, 1fr);
-    & > *:nth-child(5) {
-      display: none;
-    }
-  }
-  @media screen and (max-width: 800px) {
-    grid-template-columns: 2fr repeat(2, 1fr);
-    & > *:nth-child(5) {
-      display: none;
-    }
-    & > *:nth-child(3) {
-      display: none;
-    }
-    & > *:nth-child(4) {
-      display: none;
-    }
-  }
-  @media screen and (max-width: 500px) {
-    grid-template-columns: 2fr 1fr;
-    & > *:nth-child(5) {
-      display: none;
-    }
-    & > *:nth-child(3) {
-      display: none;
-    }
-    & > *:nth-child(4) {
-      display: none;
-    }
-    & > *:nth-child(6) {
-      display: none;
-    }
+  grid-template-columns: 3fr repeat(5, 1.5fr);
+
+  @media screen and (max-width: 900px) {
+    width: 920px;
+    grid-template-columns: 1.5fr repeat(5, 1fr);
   }
 `
 
-const RadioGroup = styled(Flex)`
-  align-items: center;
-  margin-right: 16px;
-  height: 65px;
-  cursor: pointer;
+const ButtonContainer = styled(Flex)<{ isMobile: boolean }>`
+  width: ${({ isMobile }) => isMobile ? 'calc(100% - 2px)' : ''};
+  margin-top: ${({ isMobile }) => isMobile ? '15px' : ''};
+  background: transparent;
+  border: none;
 `
 
-const StyledRadio = styled.input.attrs({ type: 'radio' })<RadioProps>`
-  appearance: none;
-  overflow: hidden;
-  cursor: pointer;
-  position: relative;
-  display: inline-block;
-  height: 16px;
-  width: 16px;
-  vertical-align: middle;
-  transition: background-color 0.2s ease-in-out;
-  border: 2px solid #C3C8D9;
-  border-radius: 50%;
-  background-color: transparent;
-  box-shadow: ${({ theme }) => theme.shadows.inset};
-
-  &:after {
-    border-radius: 50%;
-    content: '';
-    height: 8px;
-    left: 2px;
-    position: absolute;
-    top: 2px;
-    width: 8px;
-  }
-
-  &:hover:not(:disabled):not(:checked) {
-    border: 2px solid #4E89E3;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:checked {
-    border: 2px solid #4E89E3;
-    &:after {
-      background-color: #4E89E3;
-    }
-  }
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.6;
-  }
-  ${space}
+const SelectButton = styled(Button)<{ isActive: boolean, isMobile: boolean }>`
+  font-weight: ${({ isActive }) => isActive ? '600' : 'normal'};
+  font-size: 14px;
+  background: ${({ isActive }) => isActive ? 'linear-gradient(77.9deg, #DB00FF -3.83%, #2C5EE0 110.36%)' : 'transparent'};
+  color: ${({ isActive }) => isActive ? '#FFF' : 'rgba(255, 255, 255, 0.45)'};
+  border: none;
+  height: 36px;
+  padding: ${({ isMobile }) => isMobile ? '0 13px' : '0 18px'};
+  border-radius: 6px;
+  margin-right: 5px;
 `
 
 const SORT_FIELD = {
@@ -122,6 +80,8 @@ const SORT_FIELD = {
   amountToken0: 'amountToken0',
   amountToken1: 'amountToken1',
 }
+
+const ITEMS_PER_INFO_TABLE_PAGE:number = 5
 
 const TableLoader: React.FC = () => {
   const loadingRow = (
@@ -143,42 +103,32 @@ const TableLoader: React.FC = () => {
   )
 }
 
-const DataRow: React.FC<{ transaction: Transaction, index }> = ({ transaction, index }) => {
+const DataRow: React.FC<{ transaction: Transaction }> = ({ transaction }) => {
   const { t } = useTranslation()
-  const { isMobile } = useMatchBreakpoints()
   const abs0 = Math.abs(transaction.amountToken0)
   const abs1 = Math.abs(transaction.amountToken1)
   const outputTokenSymbol = transaction.amountToken0 < 0 ? transaction.token0Symbol : transaction.token1Symbol
   const inputTokenSymbol = transaction.amountToken1 < 0 ? transaction.token0Symbol : transaction.token1Symbol
 
   return (
-    <ResponsiveGrid style={{
-        height:'80px',
-        backgroundColor: index % 2 === 0 ? '#F8F9FF' : '#FFFFFF',
-        borderTopLeftRadius: index % 10 === 0 ? '12px' : '0px',
-        borderTopRightRadius: index % 10 === 0 ? '12px' : '0px',
-        borderBottomLeftRadius: index % 10 === 9 ? '12px' : '0px',
-        borderBottomRightRadius: index % 10 === 9 ? '12px' : '0px',}}>
-      <LinkExternal href={getBscScanLink(transaction.hash, 'transaction')} color='#4E89E3' >
-        <Text color='#4E89E3'>
-          {transaction.type === TransactionType.MINT
-            ? t('Add %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })
-            : transaction.type === TransactionType.SWAP
-              ? t('Swap %token0% for %token1%', { token0: inputTokenSymbol, token1: outputTokenSymbol })
-              : t('Remove %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })}
-        </Text>
+    <ResponsiveGrid>
+      <LinkExternal href={getBscScanLink(transaction.hash, 'transaction')} fontSize='14px' fontWeight='400' color='#FFF'>
+        {transaction.type === TransactionType.MINT
+          ? t('Add %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })
+          : transaction.type === TransactionType.SWAP
+            ? t('Swap %token0% for %token1%', { token0: inputTokenSymbol, token1: outputTokenSymbol })
+            : t('Remove %token0% and %token1%', { token0: transaction.token0Symbol, token1: transaction.token1Symbol })}
       </LinkExternal>
-      <Text style={{justifySelf: isMobile ? 'flex-end' : ''}}>${formatAmount(transaction.amountUSD)}</Text>
-      <Text>
-        <Text>{`${formatAmount(abs0)} ${transaction.token0Symbol}`}</Text>
-      </Text>
-      <Text>
-        <Text>{`${formatAmount(abs1)} ${transaction.token1Symbol}`}</Text>
-      </Text>
-      <LinkExternal href={getBscScanLink(transaction.sender, 'address')} color='#4E89E3'>
+      <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(transaction.amountUSD)}</Text>
+
+      <Text fontSize='14px' fontWeight='400' color='#FFF'>{`${formatAmount(abs0)} ${transaction.token0Symbol}`}</Text>
+
+      <Text fontSize='14px' fontWeight='400' color='#FFF'>{`${formatAmount(abs1)} ${transaction.token1Symbol}`}</Text>
+
+      <LinkExternal href={getBscScanLink(transaction.sender, 'address')} fontSize='14px' fontWeight='400' color='#FFF'>
         {truncateHash(transaction.sender)}
       </LinkExternal>
-      <Text>{formatDistanceToNowStrict(parseInt(transaction.timestamp, 10) * 1000)}</Text>
+      <Text fontSize='14px' fontWeight='400' color='#FFF' >{formatDistanceToNowStrict(parseInt(transaction.timestamp, 10) * 1000)}</Text>
     </ResponsiveGrid>
   )
 }
@@ -258,88 +208,94 @@ const TransactionTable: React.FC<{
 
 
   return (
-    <Wrapper>
+    <Card p={isMobile ? '0 12px' : '0px'} mb={isMobile ? '15px' : '20px'}>
       <Flex
-        mb="16px"
-        position={isMobile ? 'sticky' : 'static'}
-        top={isMobile ? '0' : ''}
-        background='#F0F3FE'>
-        <Flex flexDirection={['column', 'row']}>
-          <RadioGroup onClick={() => handleFilter(undefined)}>
-            <StyledRadio onChange={() => null} scale="sm" checked={txFilter === undefined} />
-            <Text ml={isMobile ? '2px' : '8px'}>{t('All')}</Text>
-          </RadioGroup>
+        alignItems='center'
+        justifyContent='space-between'
+        flexDirection={isMobile ? 'column' : 'row'}
+        m={isMobile ? '28px 22px 0 22px' : '25px 30px 0 35px'}
+      >
+        <Text fontSize='20px' fontWeight='600' color='#FFF' width="100%">
+          {t('Transactions')}
+        </Text>
+        <ButtonContainer isMobile={isMobile}>
+          <SelectButton
+            onClick={() => handleFilter(undefined)}
+            isActive={txFilter === undefined}
+            isMobile={isMobile}
+          >
+            {t('All')}
+          </SelectButton>
 
-          <RadioGroup onClick={() => handleFilter(TransactionType.SWAP)}>
-            <StyledRadio onChange={() => null} scale="sm" checked={txFilter === TransactionType.SWAP} />
-            <Text ml={isMobile ? '2px' : '8px'}>{t('Swaps')}</Text>
-          </RadioGroup>
-        </Flex>
+          <SelectButton
+            onClick={() => handleFilter(TransactionType.SWAP)}
+            isActive={txFilter === TransactionType.SWAP}
+            isMobile={isMobile}
+          >
+            {t('Swaps')}
+          </SelectButton>
 
-        <Flex flexDirection={['column', 'row']}>
-          <RadioGroup onClick={() => handleFilter(TransactionType.MINT)}>
-            <StyledRadio onChange={() => null} scale="sm" checked={txFilter === TransactionType.MINT} />
-            <Text ml={isMobile ? '2px' : '8px'}>{t('Adds')}</Text>
-          </RadioGroup>
+          <SelectButton
+            onClick={() => handleFilter(TransactionType.MINT)}
+            isActive={txFilter === TransactionType.MINT}
+            isMobile={isMobile}
+          >
+            {t('Adds')}
+          </SelectButton>
 
-          <RadioGroup onClick={() => handleFilter(TransactionType.BURN)}>
-            <StyledRadio onChange={() => null} scale="sm" checked={txFilter === TransactionType.BURN} />
-            <Text ml={isMobile ? '2px' : '8px'}>{t('Removes')}</Text>
-          </RadioGroup>
-        </Flex>
+          <SelectButton
+            onClick={() => handleFilter(TransactionType.BURN)}
+            isActive={txFilter === TransactionType.BURN}
+            isMobile={isMobile}
+          >
+            {t('Removes')}
+          </SelectButton>
+        </ButtonContainer>
       </Flex>
 
-      <ResponsiveGrid style={{height: '80px', backgroundColor: "#F0F3FE"}}>
-        <Text color="rgba(82, 82, 99, 0.6)" fontSize="12px" bold textTransform="uppercase">
-          {t('Action')}
-        </Text>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.amountUSD)}
-          textTransform="uppercase"
-        >
-          {t('Total Value')} {arrow(SORT_FIELD.amountUSD)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.amountToken0)}
-          textTransform="uppercase"
-        >
-          {t('Token Amount')} {arrow(SORT_FIELD.amountToken0)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.amountToken1)}
-          textTransform="uppercase"
-        >
-          {t('Token Amount')} {arrow(SORT_FIELD.amountToken1)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.sender)}
-          textTransform="uppercase"
-        >
-          {t('Account')} {arrow(SORT_FIELD.sender)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="12px"
-          bold
-          onClick={() => handleSort(SORT_FIELD.timestamp)}
-          textTransform="uppercase"
-        >
-          {t('Time')} {arrow(SORT_FIELD.timestamp)}
-        </ClickableColumnHeader>
-      </ResponsiveGrid>
-      <TableWrapper style={{gap: '0px'}}>
+      <TableWrapper style={{margin: isMobile ? '0px 22px 24px' : '10px 30px 30px 35px', width: isMobile ? 'calc(100% - 44px)' : 'calc(100% - 65px)'}}>
+
+        <ResponsiveHeaderGrid style={{marginTop: '15px'}}>
+          <Text color="rgba(255, 255, 255, 0.6)" fontSize="13px">
+            {t('Action')}
+          </Text>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.amountUSD)}
+          >
+            {t('Total Value')} {arrow(SORT_FIELD.amountUSD)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.amountToken0)}
+          >
+            {t('Token Amount')} #1 {arrow(SORT_FIELD.amountToken0)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.amountToken1)}
+          >
+            {t('Token Amount')} #2 {arrow(SORT_FIELD.amountToken1)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.sender)}
+          >
+            {t('Account')} {arrow(SORT_FIELD.sender)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.timestamp)}
+          >
+            {t('Time')} {arrow(SORT_FIELD.timestamp)}
+          </ClickableColumnHeader>
+        </ResponsiveHeaderGrid>
+
         {transactions ? (
           <>
             {sortedTransactions.map((transaction, index) => {
@@ -347,7 +303,10 @@ const TransactionTable: React.FC<{
                 return (
                   // eslint-disable-next-line react/no-array-index-key
                   <React.Fragment key={index}>
-                    <DataRow transaction={transaction} index={index}/>
+                    <DataRow transaction={transaction} />
+                    {
+                      (index < sortedTransactions.length - 1) ? <Break style={{marginBottom: '10px'}}/> : null
+                    }
                   </React.Fragment>
                 )
               }
@@ -362,28 +321,9 @@ const TransactionTable: React.FC<{
               width='100%'
               alignItems='center'
               justifyContent='center'
-              mt='38px'
-              mb='31px'>
+            >
               <PageSwitcher activePage={page} maxPages={maxPage} setPage={(index) => setPage(index)}/>
             </Flex>
-            {/* <PageButtons> */}
-            {/*  <Arrow */}
-            {/*    onClick={() => { */}
-            {/*      setPage(page === 1 ? page : page - 1) */}
-            {/*    }} */}
-            {/*  > */}
-            {/*    <ArrowSmallLeftIcon/> */}
-            {/*  </Arrow> */}
-
-            {/*  <Text>{t('Page %page% of %maxPage%', { page, maxPage })}</Text> */}
-            {/*  <Arrow */}
-            {/*    onClick={() => { */}
-            {/*      setPage(page === maxPage ? page : page + 1) */}
-            {/*    }} */}
-            {/*  > /}
-            {/*    <ArrowSmallRightIcon/> */}
-            {/*  </Arrow> */}
-            {/* </PageButtons> */}
           </>
         ) : (
           <>
@@ -393,7 +333,7 @@ const TransactionTable: React.FC<{
           </>
         )}
       </TableWrapper>
-    </Wrapper>
+    </Card>
   )
 }
 

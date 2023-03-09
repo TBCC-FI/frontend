@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
-import { ChainId, Token } from '@pancakeswap/sdk'
 import { useSelector } from 'react-redux'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
+import { ChainId, Token } from '../../../sdk'
 import { AppState } from '../../index'
 import { deserializeToken } from './helpers'
 

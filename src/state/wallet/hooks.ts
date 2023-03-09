@@ -1,11 +1,10 @@
-import { Token } from '@pancakeswap/sdk'
 import { useMemo } from 'react'
 import { useWeb3React } from '@web3-react/core'
 import ERC20_INTERFACE from 'config/abi/erc20'
 import { useAllTokens } from 'hooks/Tokens'
 import { useMulticallContract } from 'hooks/useContract'
 import { isAddress } from 'utils'
-import { Currency, CurrencyAmount, ETHER, JSBI, TokenAmount } from '../../sdk'
+import { Currency, CurrencyAmount, ETHER, JSBI, TokenAmount, Token } from '../../sdk'
 import { useSingleContractMultipleData, useMultipleContractSingleData } from '../multicall/hooks'
 
 /**
@@ -55,7 +54,6 @@ export function useTokenBalancesWithLoadingIndicator(
     () => tokens?.filter((t?: Token): t is Token => isAddress(t?.address) !== false) ?? [],
     [tokens],
   )
-
   const validatedTokenAddresses = useMemo(() => validatedTokens.map((vt) => vt.address), [validatedTokens])
 
   const balances = useMultipleContractSingleData(validatedTokenAddresses, ERC20_INTERFACE, 'balanceOf', [address])
@@ -103,7 +101,6 @@ export function useCurrencyBalances(
     () => currencies?.filter((currency): currency is Token => currency instanceof Token) ?? [],
     [currencies],
   )
-
   const tokenBalances = useTokenBalances(account, tokens)
   const containsBNB: boolean = useMemo(() => currencies?.some((currency) => currency === ETHER) ?? false, [currencies])
   const ethBalance = useBNBBalances(containsBNB ? [account] : [])

@@ -24,7 +24,7 @@ const PartnersList = [
 		href: 'https://www.binance.com/'
 	},
 	{
-		name: 'tbcc',
+		name: 'TBCC',
 		disicon: <TBCClabsTextIcon opacity={0.4} />,
 		enicon: <TBCClabsColorTextIcon />,
 		href: 'https://tbcclabs.com/'

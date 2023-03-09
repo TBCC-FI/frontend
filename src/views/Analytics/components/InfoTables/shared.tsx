@@ -3,10 +3,13 @@ import { Text, Flex } from '../../../../uikit'
 
 export const ClickableColumnHeader = styled(Text)`
   cursor: pointer;
+  height: 45px;
+  display: flex;
+  align-items: center;
 `
 
 export const TableWrapper = styled(Flex)`
-  width: 100%;
+  width: calc(100% - 65px);
   flex-direction: column;
   gap: 13px;
   margin-bottom: 60px;
@@ -14,15 +17,18 @@ export const TableWrapper = styled(Flex)`
     border-top-right-radius: 40px;
     border-top-left-radius: 40px;
   }
-`
 
-export const PageButtons = styled.div`
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 30px;
-  margin-bottom: 1.2em;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media screen and (max-width: 900px) {
+    overflow: hidden;
+    overflow-x: scroll;
+  }
 `
 
 export const Arrow = styled.div`
@@ -35,6 +41,6 @@ export const Arrow = styled.div`
 
 export const Break = styled.div`
   height: 1px;
-  background-color: ${({ theme }) => theme.colors.cardBorder};
+  background-color: rgba(217, 217, 217, 0.05);
   width: 100%;
 `

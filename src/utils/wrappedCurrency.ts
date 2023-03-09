@@ -1,5 +1,4 @@
-import { Token } from '@pancakeswap/sdk'
-import { ChainId, Currency, CurrencyAmount, ETHER, TokenAmount, WETH } from '../sdk'
+import { ChainId, Currency, CurrencyAmount, ETHER, TokenAmount, WETH, Token } from '../sdk'
 
 export function wrappedCurrency(currency: Currency | undefined, chainId: ChainId | undefined): Token | undefined {
   return chainId && currency === ETHER ? WETH[chainId] : currency instanceof Token ? currency : undefined

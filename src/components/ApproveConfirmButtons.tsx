@@ -18,7 +18,8 @@ interface ApproveConfirmButtonsProps {
   onConfirm: () => void
   buttonArrangement?: ButtonArrangement
   confirmLabel?: string
-  confirmId?: string
+  confirmId?: string,
+  width?: string
 }
 
 const StyledApproveConfirmButtonRow = styled.div`
@@ -58,6 +59,7 @@ const ApproveConfirmButtons: React.FC<ApproveConfirmButtonsProps> = ({
   buttonArrangement = ButtonArrangement.ROW,
   confirmLabel,
   confirmId,
+  width
 }) => {
   const { t } = useTranslation()
   const confirmButtonText = confirmLabel ?? t('Confirm')
@@ -65,12 +67,13 @@ const ApproveConfirmButtons: React.FC<ApproveConfirmButtonsProps> = ({
   const ApproveConfirmRow = () => {
     return (
       <StyledApproveConfirmButtonRow>
-        <Box>
+        <Box width={width}>
           <StyledBtn
             disabled={isApproveDisabled}
             onClick={onApprove}
             endIcon={isApproving ? spinnerIcon : undefined}
             isLoading={isApproving}
+            width={width}
           >
             {isApproving ? t('Enabling') : t('Enable')}
           </StyledBtn>
@@ -98,20 +101,21 @@ const ApproveConfirmButtons: React.FC<ApproveConfirmButtonsProps> = ({
     return (
       <>
         {isApproveDisabled ? (
-          <Box>
+          <Box width={width}>
             <StyledBtn
               id={confirmId}
               onClick={onConfirm}
               disabled={isConfirmDisabled}
               isLoading={isConfirming}
               endIcon={isConfirming ? spinnerIcon : undefined}
+              width={width}
             >
               {isConfirming ? t('Confirming') : confirmButtonText}
             </StyledBtn>
           </Box>
         ) : (
-          <Box>
-            <StyledBtn onClick={onApprove} endIcon={isApproving ? spinnerIcon : undefined} isLoading={isApproving}>
+          <Box width={width}>
+            <StyledBtn width={width} onClick={onApprove} endIcon={isApproving ? spinnerIcon : undefined} isLoading={isApproving}>
               {isApproving ? t('Enabling') : t('Enable')}
             </StyledBtn>
           </Box>

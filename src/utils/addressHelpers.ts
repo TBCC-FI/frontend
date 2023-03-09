@@ -1,6 +1,6 @@
-import { ChainId } from '@pancakeswap/sdk'
 import addresses from 'config/constants/contracts'
 import { Address } from 'config/constants/types'
+import { ChainId } from '../sdk'
 
 export const getAddress = (address: Address): string => {
   const chainId = process.env.REACT_APP_CHAIN_ID
@@ -24,6 +24,9 @@ export const getStakingAddress = () => {
 }
 export const getNftAddress = () => {
   return getAddress(addresses.nftTBCC)
+}
+export const getNftTDAAddress = () => {
+  return getAddress(addresses.nftTDA)
 }
 export const getB8dexProfileAddress = () => {
   return getAddress(addresses.b8dexProfile)

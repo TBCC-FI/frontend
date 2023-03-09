@@ -1,5 +1,4 @@
 import React from 'react'
-import { Currency, Token } from '@pancakeswap/sdk'
 import styled from 'styled-components'
 import { AutoRow } from 'components/Layout/Row'
 import { AutoColumn } from 'components/Layout/Column'
@@ -7,6 +6,7 @@ import { CurrencyLogo } from 'components/Logo'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { getBscScanLink } from 'utils'
 import { wrappedCurrency } from 'utils/wrappedCurrency'
+import { Currency, Token } from '../sdk'
 import { Button, Text, Modal, useModal, InjectedModalProps, Link } from '../uikit'
 import { useUnsupportedTokens } from '../hooks/Tokens'
 

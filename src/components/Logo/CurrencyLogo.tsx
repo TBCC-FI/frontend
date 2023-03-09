@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import styled from 'styled-components'
-import { Token } from '@pancakeswap/sdk'
 import { ETHER } from '../../sdk'
 import {BinanceIcon, BUSDIcon, USDTIcon, TBCCIcon, ShibIcon, DogeIcon, BSWIcon, B8TIcon} from '../../uikit'
 import useHttpLocations from '../../hooks/useHttpLocations'
@@ -12,6 +11,7 @@ const StyledLogo = styled(Logo)<{ size: string; ml?: string }>`
   width: ${({ size }) => size};
   height: ${({ size }) => size};
   margin-left: ${({ ml }) => ml || 0};
+  border-radius: ${({ size }) => size};
 `
 
 export default function CurrencyLogo({
@@ -29,16 +29,22 @@ export default function CurrencyLogo({
 
   const srcs: string[] = useMemo(() => {
     if (currency === ETHER) return []
+    if (!currency) return []
 
-    if (currency instanceof Token) {
-      if (currency instanceof WrappedTokenInfo) {
+    if (currency?.address) {
+      if (uriLocations.length) {
         return [...uriLocations, getTokenLogoURL(currency.address)]
       }
+
       return [getTokenLogoURL(currency.address)]
     }
     return []
   }, [currency, uriLocations])
+
   if (currency === ETHER) {
+    return <BinanceIcon width={size} style={style} />
+  }
+  if (!currency) {
     return <BinanceIcon width={size} style={style} />
   }
 

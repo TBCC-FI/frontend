@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { Flex, ArrowDownIcon, ArrowUpIcon } from '../../uikit'
 import styled, { keyframes } from 'styled-components'
+import { Flex, ArrowDownIcon, ArrowUpIcon } from '../../uikit'
 import { CalculatorMode, RoiCalculatorReducerState } from './useRoiCalculatorReducer'
 
 const rotate = keyframes`

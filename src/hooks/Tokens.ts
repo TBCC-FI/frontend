@@ -48,7 +48,7 @@ export function useAllTokens(): { [address: string]: Token } {
 export function useAllInactiveTokens(): { [address: string]: Token } {
   // get inactive tokens
   const inactiveTokensMap = useCombinedInactiveList()
-  const inactiveTokens = useTokensFromMap(inactiveTokensMap)
+    const inactiveTokens = useTokensFromMap(inactiveTokensMap)
 
   // filter out any token that are on active list
   const activeTokensAddresses = Object.keys(useAllTokens())

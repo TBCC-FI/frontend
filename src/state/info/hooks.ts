@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUnixTime, startOfHour, Duration, sub } from 'date-fns'
 import { AppState, AppDispatch } from 'state'
 import { isAddress } from 'utils'
-import { Transaction } from 'state/info/types'
+import {TokenBurnFields, Transaction} from 'state/info/types'
 import fetchPoolChartData from 'state/info/queries/pools/chartData'
 import fetchPoolTransactions from 'state/info/queries/pools/transactions'
 import fetchTokenChartData from 'state/info/queries/tokens/chartData'
@@ -23,9 +23,14 @@ import {
   addTokenPoolAddresses,
   updateTokenChartData,
   updateTokenPriceData,
-  updateTokenTransactions,
+  updateTokenTransactions, typeTokenBurnInput,
 } from './actions'
 import { ProtocolData, PoolData, TokenData, ChartEntry, PriceChartEntry } from './types'
+import {Percent, Token, TokenAmount} from "../../sdk";
+import useActiveWeb3React from "../../hooks/useActiveWeb3React";
+import {useTranslation} from "../../contexts/Localization";
+import {useTokenBalances} from "../wallet/hooks";
+import {tryParseAmount} from "../swap/hooks";
 
 // Protocol hooks
 
@@ -304,6 +309,8 @@ export const useTokenPriceData = (
   return priceData
 }
 
+
+
 export const useTokenTransactions = (address: string): Transaction[] | undefined => {
   const dispatch = useDispatch<AppDispatch>()
   const token = useSelector((state: AppState) => state.info.tokens.byAddress[address])
@@ -325,4 +332,82 @@ export const useTokenTransactions = (address: string): Transaction[] | undefined
   }, [address, dispatch, error, transactions])
 
   return transactions
+}
+
+// Token burn hooks
+export const useTokenBurnState = () => {
+  return useSelector((state: AppState) => state.info.burns)
+}
+
+export const useDerivedTokenBurnInfo = (token: Token | undefined): {
+  parsedAmounts: {
+    [TokenBurnFields.TOKEN_PERCENT]: Percent
+    [TokenBurnFields.TOKEN]?: TokenAmount
+  }
+  userBalance?: TokenAmount
+  error?: string
+} => {
+  const { account } = useActiveWeb3React()
+
+  const { independentField, typedValue } = useTokenBurnState()
+  const { t } = useTranslation()
+
+  // balances
+  const relevantTokenBalances = useTokenBalances(account ?? undefined, [token])
+  const userBalance: undefined | TokenAmount = relevantTokenBalances?.[token?.address ?? '']
+
+  // token values
+  let percentToRemove: Percent = new Percent('0', '100')
+  // user specified a %
+  if (independentField === TokenBurnFields.TOKEN_PERCENT) {
+    percentToRemove = new Percent(typedValue, '100')
+  }
+  // user specified a specific amount of tokens
+  else if (independentField === TokenBurnFields.TOKEN) {
+    if (token) {
+      const independentAmount = tryParseAmount(typedValue, token)
+      if (independentAmount && userBalance && !independentAmount.greaterThan(userBalance)) {
+        percentToRemove = new Percent(independentAmount.raw, userBalance.raw)
+      }
+    }
+  }
+
+  const parsedAmounts: {
+    [TokenBurnFields.TOKEN_PERCENT]: Percent
+    [TokenBurnFields.TOKEN]?: TokenAmount
+  } = {
+    [TokenBurnFields.TOKEN_PERCENT]: percentToRemove,
+    [TokenBurnFields.TOKEN]:
+      userBalance && percentToRemove && percentToRemove.greaterThan('0')
+        ? new TokenAmount(userBalance.token, percentToRemove.multiply(userBalance.raw).quotient)
+        : undefined,
+  }
+
+  let error: string | undefined
+  if (!account) {
+    error = t('Connect Wallet')
+  }
+
+  if (!parsedAmounts[TokenBurnFields.TOKEN]) {
+    error = error ?? t('Enter an amount')
+  }
+
+  return { parsedAmounts, userBalance, error }
+}
+
+export const useTokenBurnActionHandlers = (): {
+  onUserInput: (field: TokenBurnFields, typedValue: string) => void
+} => {
+  const dispatch = useDispatch<AppDispatch>()
+
+  const onUserInput = useCallback(
+    (field: TokenBurnFields, typedValue: string) => {
+      dispatch(typeTokenBurnInput({ field, typedValue }))
+    },
+    [dispatch],
+  )
+
+  return {
+    onUserInput,
+  }
 }

@@ -1,15 +1,15 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, {useCallback, useState, useMemo, useEffect} from 'react'
 import styled from 'styled-components'
-import { Link } from 'react-router-dom'
-import {formatAmount, formatAmountThousands} from 'views/Swap/utils/formatInfoNumbers'
+// import { Link } from 'react-router-dom'
+import {formatAmount} from 'views/Swap/utils/formatInfoNumbers'
 import { PoolData } from 'state/info/types'
 import { CurrencyLogo } from 'components/Logo'
 import { useTranslation } from 'contexts/Localization'
-import { fromUnixTime } from 'date-fns'
-import { Area, AreaChart } from 'recharts'
-import { Text, Flex, Box, Skeleton, useMatchBreakpoints } from '../../../../uikit'
-import { ClickableColumnHeader, TableWrapper } from './shared'
-import { usePoolChartData, useTokenData } from '../../../../state/info/hooks'
+import { Text, Flex, Box, Skeleton, useMatchBreakpoints, Card } from '../../../../uikit'
+import {Break, ClickableColumnHeader, TableWrapper} from './shared'
+import PageSwitcher from "../PageSwitcher";
+import {Token} from "../../../../sdk";
+import {useToken} from "../../../../hooks/Tokens";
 
 /**
  *  Columns on different layouts
@@ -18,88 +18,49 @@ import { usePoolChartData, useTokenData } from '../../../../state/info/hooks'
  *  3 = | # | Pool |     | Volume 24H |           |
  *  2 = |   | Pool |     | Volume 24H |           |
  */
-const ResponsiveHeaderGrid = styled.div<{activeTab?: number}>`
-  background-color: #F0F0FE;
-  height: 65px;
+const ResponsiveHeaderGrid = styled.div`
   display: grid;
   grid-gap: 1em;
   align-items: center;
-  grid-template-columns: 1.5fr 1fr 0.6fr 1fr 1.8fr;
-  padding: 20px;
-  @media screen and (max-width: 900px) {
-    grid-template-columns: 1.5fr repeat(3, 1fr);
-    & :nth-child(5) {
-      display: none;
-    }
-  }
-  @media screen and (max-width: 500px) {
-    grid-template-columns: 1.5fr repeat(1, 1fr);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.09);
 
-    & :nth-child(5),
-    & :nth-child(6),
-    & :nth-child(7) {
-      display: none;
-    }
-  }
-  @media screen and (max-width: 480px) {
-    grid-template-columns: 1.5fr repeat(2, auto);
-    padding: 8px 0;
-    > *:nth-child(3) {
-      color: ${({activeTab}) => activeTab === 1 ? '#525263' : ''};
-    }
-    > *:nth-child(4) {
-      color: ${({activeTab}) => activeTab === 2 ? '#525263' : ''};
-    }
-    > *:nth-child(2) {
+  padding: 0 10px;
+  margin-bottom: 10px;
+
+  grid-template-columns: 20px 3fr repeat(5, 1.5fr);
+
+  @media screen and (max-width: 900px) {
+    width: 900px;
+    grid-template-columns: 1.5fr repeat(5, 1fr);
+    > *:first-child {
       display: none;
     }
   }
 `
-const ResponsiveGrid = styled.div<{activeTab?: number}>`
+
+const ResponsiveGrid = styled.div<{ activeTab?: number }>`
   display: grid;
   grid-gap: 1em;
   align-items: center;
-  grid-template-columns: 1.5fr 1fr 0.6fr 1fr 1.8fr;
+  grid-template-columns: 20px 3fr repeat(5, 1.5fr);
 
-  padding: 20px;
   @media screen and (max-width: 900px) {
-    grid-template-columns: 1.5fr repeat(3, 1fr);
-    & :nth-child(5) {
+    width: 900px;
+    grid-template-columns: 1.5fr repeat(5, 1fr);
+    > *:first-child {
       display: none;
-    }
-  }
-  @media screen and (max-width: 500px) {
-    grid-template-columns: 1.5fr repeat(1, 1fr);
-    & :nth-child(5),
-    & :nth-child(6),
-    & :nth-child(7) {
-      display: none;
-    }
-  }
-  @media screen and (max-width: 480px) {
-    grid-template-columns: 1.5fr repeat(2, auto);
-    padding: 18px;
-    > *:nth-child(2) {
-      display: none;
-    }
-    > *:nth-child(3) {
-      display: ${({activeTab}) => activeTab === 1 ? '' : 'none'};
-    }
-    > *:nth-child(4) {
-      display: ${({activeTab}) => activeTab === 2 ? '' : 'none'};
     }
   }
 `
 
-const LinkWrapper = styled(Link)`
-  text-decoration: none;
-  background: #FFFFFF;
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.02);
-  border-radius: 12px;
-
-  :hover {
-    cursor: pointer;
-    opacity: 0.7;
+const ResponsiveLogo = styled(CurrencyLogo)`
+  @media screen and (max-width: 670px) {
+    width: 16px;
+    height: 16px;
   }
 `
 
@@ -119,6 +80,8 @@ const LoadingRow: React.FC = () => (
     <Skeleton />
     <Skeleton />
     <Skeleton />
+    <Skeleton />
+    <Skeleton />
   </ResponsiveGrid>
 )
 
@@ -130,113 +93,66 @@ const TableLoader: React.FC = () => (
   </>
 )
 
-const DataRow = ({ poolData, currentCurrency, index, priceUSDTBCC, activeTab }: { poolData: PoolData; currentCurrency: string; index: number, priceUSDTBCC: number, activeTab?: number }) => {
+const DataRow = ({ poolData, activeTab, index }: { poolData: PoolData; activeTab?: number, index: number }) => {
   const { isMobile } = useMatchBreakpoints()
-  const chartData = usePoolChartData(poolData.address)
-  const currencyTBCC: any = useTokenData(currentCurrency)
 
-  const poolCurrency:any = {
-    currency: poolData?.token0?.address === currencyTBCC?.address ? poolData.token1 : poolData.token0,
-    price: poolData?.token0?.address === currencyTBCC?.address ? poolData.token0Price : poolData.token1Price,
-  };
-
-  poolCurrency.currencyAddress = useTokenData(poolCurrency.currency.address)
-
-  const formattedVolumeData = useMemo(() => {
-    if (chartData) {
-      return chartData.map((day) => {
-        return {
-          time: fromUnixTime(day.date),
-          value: day.volumeUSD,
-        }
-      })
-    }
-    return []
-  }, [chartData])
-
-
+  const tokenLogoData1: Token = useToken(poolData?.token0?.address)
+  const tokenLogoData2: Token = useToken(poolData?.token1?.address)
 
   return (
-    <LinkWrapper key={index} to={`/pools/${poolData.address}`}>
+    // <LinkWrapper key={index} to={`/pools/${poolData.address}`}>
       <ResponsiveGrid activeTab={activeTab}>
-        <Flex alignItems="center">
-          <CurrencyLogo currency={poolCurrency.currencyAddress} size="32px" />
-          {isMobile
-            ? <Flex flexDirection='column'>
-              <Text ml="6px" mb='5px' fontSize={isMobile ? '16px' : '18px'} color="#505050" fontWeight="500" lineHeight="20px" >
-                {poolCurrency.currencyAddress?.symbol}
-              </Text>
-              <Text fontSize="15px" color="#8A8A8A" fontWeight="normal" lineHeight="16px" ml="6px">
-                {poolCurrency.currencyAddress?.name}
-              </Text>
-              </Flex>
-            : <>
-              <Text ml="6px" fontSize={isMobile ? '16px' : '18px'} color="#505050" fontWeight="500" lineHeight="20px" >
-                {poolCurrency.currencyAddress?.symbol}
-              </Text>
-              <Text fontSize="15px" color="#8A8A8A" fontWeight="normal" lineHeight="16px" ml="6px">
-                {poolCurrency.currencyAddress?.name}
-              </Text>
-            </>
-          }
+        <Flex ml='10px'>
+          <Text fontSize='16px' color='#FFF'>{index + 1}</Text>
+        </Flex>
 
-        </Flex>
-        <Flex alignItems="center">
-          {/* <CurrencyLogo currency={currencyTBCC} size="20px"/> */}
-          <Text fontSize="15px" color="#505050" fontWeight="normal" lineHeight="16px">{formatAmountThousands(poolCurrency.price)}</Text>
-          <Text ml="6px" fontSize="15px" color="#505050" fontWeight="normal" lineHeight="16px">
-            {currencyTBCC?.symbol}
-          </Text>
-        </Flex>
-        <Text mr="8px" fontSize="15px" color="#4E89E3" fontWeight="normal" lineHeight="16px">{formatAmount(poolData.lpApr7d)}%</Text>
-        <Flex alignItems="center">
-          {/* <CurrencyLogo currency={currencyTBCC} size="20px"/> */}
-          <Flex p="4px" justifyContent="flex-end"minWidth="80px">
-            <Text fontSize="15px" color='#525263' fontWeight="normal" lineHeight="16px">{poolData.volumeUSD ? formatAmount(poolData.volumeUSD * priceUSDTBCC) : '—'}</Text>
+        <Flex alignItems="center" ml={isMobile ? '0' : '14px'}>
+          <ResponsiveLogo currency={tokenLogoData1} />
+          <ResponsiveLogo currency={tokenLogoData2} />
+          <Flex marginLeft="10px">
+            <Text fontSize='14px' fontWeight='400' color='#FFF'>{poolData?.token0?.symbol}/{poolData?.token1?.symbol}</Text>
           </Flex>
-          <Text ml="6px" fontSize="15px" color="#505050" fontWeight="normal" lineHeight="16px">
-            {currencyTBCC?.symbol}
-          </Text>
         </Flex>
-        <Flex alignItems="center">
-          <AreaChart
-            data={formattedVolumeData}
-            width={102}
-            height={32}
-            margin={{
-              top: 0,
-              right: 0,
-              left: 0,
-              bottom: 0,
-            }}
-          >
-            <Area dataKey="value" type="monotone" stroke='#4E89E3' fill="url(#gradient)" strokeWidth={1.5} />
-          </AreaChart>
-          <Flex mr="16px" />
-          {/* <CurrencyLogo currency={currencyTBCC} size="20px"/> */}
-          <Text fontSize="15px" color="#505050" fontWeight="normal" lineHeight="16px">{formatAmount(poolData.volumeUSDWeek * priceUSDTBCC)}</Text>
-          <Text ml="6px" fontSize="15px" color="#505050" fontWeight="normal" lineHeight="16px">
-            {currencyTBCC?.symbol}
-          </Text>
-        </Flex>
+
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(poolData.volumeUSD, { notation: 'standard' })}</Text>
+
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(poolData.volumeUSDWeek, { notation: 'standard' })}</Text>
+
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(poolData.lpFees24h, { notation: 'standard' })}</Text>
+
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>{formatAmount(poolData.lpApr7d, { notation: 'standard' })}%</Text>
+
+        <Text fontSize='14px' fontWeight='400' color='#FFF'>${formatAmount(poolData.liquidityUSD, { notation: 'standard' })}</Text>
       </ResponsiveGrid>
-    </LinkWrapper>
+    // </LinkWrapper>
   )
 }
 
 interface PoolTableProps {
   poolDatas: PoolData[]
+  maxItems?: number
   loading?: boolean // If true shows indication that SOME pools are loading, but the ones already fetched will be shown
-  currentCurrency: string
 }
 
-const PoolTable: React.FC<PoolTableProps> = ({ poolDatas, loading, currentCurrency }) => {
+const PoolTable: React.FC<PoolTableProps> = ({ poolDatas, loading, maxItems}) => {
   // for sorting
-  const [sortField, setSortField] = useState(SORT_FIELD.token1Price)
+  const [sortField, setSortField] = useState(SORT_FIELD.volumeUSD)
   const [sortDirection, setSortDirection] = useState<boolean>(true)
   const { t } = useTranslation()
   const { isMobile } = useMatchBreakpoints()
   const [activeTab, setActiveTab] = useState(1)
+
+  const [page, setPage] = useState(1)
+  const [maxPage, setMaxPage] = useState(1)
+  useEffect(() => {
+    let extraPages = 1
+    if (poolDatas) {
+      if (poolDatas.length % maxItems === 0) {
+        extraPages = 0
+      }
+      setMaxPage(Math.floor(poolDatas.length / maxItems) + extraPages)
+    }
+  }, [maxItems, poolDatas])
 
   const sortedPools = useMemo(() => {
     return poolDatas
@@ -249,8 +165,9 @@ const PoolTable: React.FC<PoolTableProps> = ({ poolDatas, loading, currentCurren
           }
           return -1
         })
+        .slice(maxItems * (page - 1), page * maxItems)
       : []
-  }, [poolDatas, sortDirection, sortField])
+  }, [poolDatas, maxItems, page, sortDirection, sortField])
 
   const handleSort = useCallback(
     (newField: string) => {
@@ -268,79 +185,90 @@ const PoolTable: React.FC<PoolTableProps> = ({ poolDatas, loading, currentCurren
     [sortDirection, sortField],
   )
 
-  let priceUSDTBCC = 0
-
-  sortedPools.forEach((poolData) => {
-    if (poolData && (poolData.token0.address === '0xe9e7cea3dedca5984780bafc599bd69add087d56' || poolData.token1.address === '0xe9e7cea3dedca5984780bafc599bd69add087d56')) {
-      priceUSDTBCC = poolData.token0.address === '0xe9e7cea3dedca5984780bafc599bd69add087d56' ? poolData.token1Price : poolData.token0Price
-    }
-  })
+  if (loading) {
+    return <Skeleton />
+  }
 
   return (
-    <TableWrapper>
-      <ResponsiveHeaderGrid style={{ paddingBottom: isMobile? '8px' : "12px", position: isMobile ? 'sticky' : 'static', top: isMobile ? '0' : ''}} activeTab={activeTab}>
-        <Text color="rgba(82, 82, 99, 0.6)" fontSize="16px" lineHeight="16px" fontWeight="normal">
-          {t('#Name')}
-        </Text>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="15px"
-          lineHeight="16px"
-          fontWeight="normal"
-          onClick={() => handleSort(SORT_FIELD.token1Price)}
-        >
-          {t('Price')} {arrow(SORT_FIELD.token1Price)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="15px"
-          lineHeight="16px"
-          fontWeight="normal"
-          onClick={isMobile ? () => setActiveTab(1) : () => handleSort(SORT_FIELD.lpApr7d)}
-        >
-          {t('Reward APR%')} {arrow(SORT_FIELD.lpApr7d)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="15px"
-          lineHeight="16px"
-          fontWeight="normal"
-          onClick={ isMobile ?( () => setActiveTab(2) ): ( () => handleSort(SORT_FIELD.volumeUSD) )}
-        >
-          {t('Volume 24H')} {arrow(SORT_FIELD.volumeUSD)}
-        </ClickableColumnHeader>
-        <ClickableColumnHeader
-          color="rgba(82, 82, 99, 0.6)"
-          fontSize="15px"
-          lineHeight="16px"
-          fontWeight="normal"
-          onClick={() => handleSort(SORT_FIELD.volumeUSDWeek)}
-        >
-          {t('Volume 7D')} {arrow(SORT_FIELD.volumeUSDWeek)}
-        </ClickableColumnHeader>
-      </ResponsiveHeaderGrid>
-      {sortedPools.length > 0 ? (
-        <>
-          {sortedPools.map((poolData, i) => {
-            if (poolData) {
-              return (
-                <React.Fragment key={poolData.address}>
-                  <DataRow index={i} poolData={poolData} priceUSDTBCC={priceUSDTBCC} activeTab={activeTab} currentCurrency={currentCurrency}/>
-                </React.Fragment>
-              )
-            }
-            return null
-          })}
-          {loading && <LoadingRow />}
-        </>
-      ) : (
-        <>
-          <TableLoader />
-          {/* spacer */}
-          <Box />
-        </>
-      )}
-    </TableWrapper>
+    <Card p={isMobile ? '0 12px' : '0px'} mb={isMobile ? '15px' : '20px'}>
+      <Text fontSize='20px' fontWeight='600' color='#FFF' m={isMobile ? '28px 22px 0 22px' : '25px 30px 0 35px'}>
+        {t('Top Pools')}
+      </Text>
+      <TableWrapper style={{margin: isMobile ? '0px 22px 24px' : '10px 30px 30px 35px', width: isMobile ? 'calc(100% - 44px)' : 'calc(100% - 65px)'}}>
+        <ResponsiveHeaderGrid style={{marginTop: '15px'}}>
+          <Text color="rgba(255, 255, 255, 0.6)" fontSize="13px">
+            {t('#')}
+          </Text>
+          <Text color="rgba(255, 255, 255, 0.6)" fontSize="13px">
+            {t('Name')}
+          </Text>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.volumeUSD)}
+          >
+            {t('Volume')} {t('24h')} {arrow(SORT_FIELD.volumeUSD)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={isMobile ? () => setActiveTab(1) : () => handleSort(SORT_FIELD.volumeUSDWeek)}
+          >
+            {t('Volume')} {t('7d')} {arrow(SORT_FIELD.volumeUSDWeek)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={isMobile ? (() => setActiveTab(2)) : (() => handleSort(SORT_FIELD.lpFees24h))}
+          >
+            {t('LP reward fees')} {t('24h')} {arrow(SORT_FIELD.lpFees24h)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.lpApr7d)}
+          >
+            {t('LP reward APR')} {arrow(SORT_FIELD.lpApr7d)}
+          </ClickableColumnHeader>
+          <ClickableColumnHeader
+            color="rgba(255, 255, 255, 0.6)"
+            fontSize="13px"
+            onClick={() => handleSort(SORT_FIELD.liquidityUSD)}
+          >
+            {t('Liquidity')} {arrow(SORT_FIELD.liquidityUSD)}
+          </ClickableColumnHeader>
+        </ResponsiveHeaderGrid>
+        {sortedPools.length > 0 ? (
+          <>
+            {sortedPools.map((poolData, i) => {
+              if (poolData) {
+                return (
+                  <React.Fragment key={poolData.address}>
+                    <DataRow poolData={poolData} activeTab={activeTab} index={(page - 1) * maxItems + i} />
+                    {
+                      (i < sortedPools.length - 1) ? <Break style={{marginBottom: '10px'}}/> : null
+                    }
+                  </React.Fragment>
+                )
+              }
+              return null
+            })}
+            <Flex
+              width='100%'
+              alignItems='center'
+              justifyContent='center'
+            >
+              <PageSwitcher activePage={page} maxPages={maxPage} setPage={(index) => setPage(index)}/>
+            </Flex>
+          </>
+        ) : (
+          <>
+            <TableLoader />
+            <Box />
+          </>
+        )}
+      </TableWrapper>
+    </Card>
   )
 }
 

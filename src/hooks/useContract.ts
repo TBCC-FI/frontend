@@ -30,14 +30,20 @@ import {
   getNftMarketContract,
   getNftSaleContract,
   getPancakeSquadContract,
-  getErc721CollectionContract, getB8DContract, getBUSDContract, getStakingContract, getNftContract, getTBCCContract
+  getErc721CollectionContract,
+  getB8DContract,
+  getBUSDContract,
+  getStakingContract,
+  getNftContract,
+  getTBCCContract,
+  getNftTDAContract
 } from 'utils/contractHelpers'
 import { getMulticallAddress } from 'utils/addressHelpers'
 
 // Imports below migrated from Exchange useContract.ts
 import { Contract } from '@ethersproject/contracts'
-import { ChainId, WETH } from '@pancakeswap/sdk'
 import { abi as IUniswapV2PairABI } from '@uniswap/v2-core/build/IUniswapV2Pair.json'
+import { ChainId, WETH } from '../sdk'
 import ENS_PUBLIC_RESOLVER_ABI from '../config/abi/ens-public-resolver.json'
 import ENS_ABI from '../config/abi/ens-registrar.json'
 import { ERC20_BYTES32_ABI } from '../config/abi/erc20'
@@ -121,6 +127,11 @@ export const useStakingContract = () => {
 export const useNftContract = () => {
   const { library } = useActiveWeb3React()
   return useMemo(() => getNftContract(library.getSigner()), [library])
+}
+
+export const useNftTDAContract = () => {
+  const { library } = useActiveWeb3React()
+  return useMemo(() => getNftTDAContract(library.getSigner()), [library])
 }
 
 export const useTBCC = () => {

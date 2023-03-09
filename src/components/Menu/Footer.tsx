@@ -32,13 +32,13 @@ const Footer: React.FC<{ backgroundColor?: string }> = ({ backgroundColor }) => 
       </Flex>
       <Flex flexDirection={['column', 'column', 'row']} alignItems="center" justifyContent="center" mb="20px">
         <Text color="#8A8A8A" fontSize="14px" lineHeight="16px">
-          {t('All rights reserved © 2022 B8DEX')}
+          {t('All rights reserved')}© 2023 TBCC
         </Text>
       </Flex>
       <Flex flexDirection={['column', 'column', 'row']} alignItems="center" justifyContent="center">
-        <Link external href={getBscScanLink('0x4dcCa80514c13dAcBd4A00c4E8dB891592a89306', null, chainId)}>
+        <Link external href={getBscScanLink('0xf29480344d8e21efeab7fde39f8d8299056a7fea', null, chainId)}>
           <Text color="#8A8A8A" fontSize="14px" lineHeight="16px">
-            {t('Token address')}: 0x4dcCa80514c13dAcBd4A00c4E8dB891592a89306
+            {t('Token address')}: 0xf29480344d8e21efeab7fde39f8d8299056a7fea
           </Text>
         </Link>
       </Flex>

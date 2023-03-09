@@ -1,18 +1,26 @@
 import React, { useState, useMemo } from 'react'
-import { Input } from '../../uikit'
 import styled from 'styled-components'
 import debounce from 'lodash/debounce'
 import { useTranslation } from 'contexts/Localization'
+import { Input } from '../../uikit'
 
-const StyledInput = styled(Input)`
-  border-radius: 16px;
-  margin-left: auto;
-`
+export const StyledInput = styled(Input)`
+  width: 190px;
+  height: 45px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  color: #FFF;
 
-const InputWrapper = styled.div`
-  position: relative;
-  ${({ theme }) => theme.mediaQueries.sm} {
-    display: block;
+  &::placeholder {
+    font-weight: 600;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  @media (max-width: 968px) {
+    width: 100%;
+    margin-top: 15px;
   }
 `
 
@@ -36,11 +44,7 @@ const SearchInput: React.FC<Props> = ({ onChange: onChangeCallback, placeholder 
     debouncedOnChange(e)
   }
 
-  return (
-    <InputWrapper>
-      <StyledInput value={searchText} onChange={onChange} placeholder={t(placeholder)} />
-    </InputWrapper>
-  )
+  return <StyledInput value={searchText} onChange={onChange} placeholder={t(placeholder)} />
 }
 
 export default SearchInput

@@ -21,6 +21,10 @@ export const footerAboutUsLinks: FooterLinkType[] = [
 ]
 export const footerSupportLinks: FooterLinkType[] = [
   {
+    label: 'Tools',
+    href: 'https://whattofarm.io/?pool=TBCCFinance',
+  },
+  {
     label: 'Fees',
     href: '#',
   },
@@ -43,6 +47,10 @@ export const footerSupportLinks: FooterLinkType[] = [
 ]
 
 export const socials: FooterLinkType[] = [
+  {
+    label: 'Medium',
+    href: 'https://medium.com/@cryptoma4o',
+  },
   {
     label: 'Telegram EN channel',
     href: 'https://t.me/tbccglobal',

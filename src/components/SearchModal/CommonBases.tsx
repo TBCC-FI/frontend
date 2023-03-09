@@ -1,9 +1,8 @@
 import React from 'react'
-import { Token } from '@pancakeswap/sdk'
 import styled from 'styled-components'
 import { useTranslation } from 'contexts/Localization'
 import { Text } from '../../uikit'
-import { ChainId, Currency, currencyEquals, ETHER } from '../../sdk'
+import { ChainId, Currency, currencyEquals, ETHER, Token } from '../../sdk'
 
 import { SUGGESTED_BASES } from '../../config/constants'
 import { AutoColumn } from '../Layout/Column'

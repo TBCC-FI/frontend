@@ -1,6 +1,5 @@
-import { Token, ChainId } from '@pancakeswap/sdk'
 import { isAddress } from 'utils'
-import {Pair} from '../sdk'
+import {Pair, Token, ChainId} from '../sdk'
 
 const getLpAddress = (token1: string | Token, token2: string | Token) => {
   let token1AsTokenInstance = token1

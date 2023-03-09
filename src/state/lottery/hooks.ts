@@ -36,7 +36,6 @@ export const useFetchLottery = () => {
   const { fastRefresh } = useRefresh()
   const dispatch = useAppDispatch()
   const currentLotteryId = useGetCurrentLotteryId()
-
   useEffect(() => {
     // get current lottery ID & max ticket buy
     dispatch(fetchCurrentLotteryId())

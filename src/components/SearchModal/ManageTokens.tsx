@@ -1,18 +1,18 @@
 import React, { useRef, RefObject, useCallback, useState, useMemo } from 'react'
-import { Token } from '@pancakeswap/sdk'
-import { Text, Button, CloseIcon, IconButton, LinkExternal, Input, Link } from '../../uikit'
 import styled from 'styled-components'
 import Row, { RowBetween, RowFixed } from 'components/Layout/Row'
 import { useToken } from 'hooks/Tokens'
-import { useRemoveUserAddedToken } from 'state/user/hooks'
+import {useRemoveUserAddedToken} from 'state/user/hooks'
 import useUserAddedTokens from 'state/user/hooks/useUserAddedTokens'
 import { CurrencyLogo } from 'components/Logo'
 import { getBscScanLink, isAddress } from 'utils'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import { useTranslation } from 'contexts/Localization'
+import {Text, CloseIcon, IconButton, LinkExternal, Input, Button} from '../../uikit'
 import Column, { AutoColumn } from '../Layout/Column'
 import ImportRow from './ImportRow'
 import { CurrencyModalView } from './types'
+import {Currency, Token} from "../../sdk";
 
 const Wrapper = styled.div`
   width: 100%;
@@ -21,21 +21,41 @@ const Wrapper = styled.div`
   padding-bottom: 60px;
 `
 
-const Footer = styled.div`
-  position: absolute;
-  bottom: 0;
+const SearchInput = styled(Input)`
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  background: #FFFFFF;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+  box-shadow: none;
+  font-size: 15px;
+  line-height: 16px;
+  color: #505050;
+  flex: 1 1 0;
+  height: 47px;
+
+  &:focus:not(:disabled) {
+    box-shadow: none;
+  }
+`
+
+const StyledLink = styled(Button)`
+  color: #505050;
+  font-weight: 500;
+  margin-left: 10px;
+  font-size: 14px;
+  background: none;
+  height: auto;
+  padding: 0;
 `
 
 export default function ManageTokens({
   setModalView,
   setImportToken,
+  handleCurrencySelect
 }: {
   setModalView: (view: CurrencyModalView) => void
   setImportToken: (token: Token) => void
+  handleCurrencySelect?: (currency: Currency) => void
 }) {
   const { chainId } = useActiveWeb3React()
 
@@ -58,14 +78,6 @@ export default function ManageTokens({
   const userAddedTokens: Token[] = useUserAddedTokens()
   const removeToken = useRemoveUserAddedToken()
 
-  const handleRemoveAll = useCallback(() => {
-    if (chainId && userAddedTokens) {
-      userAddedTokens.map((token) => {
-        return removeToken(chainId, token.address)
-      })
-    }
-  }, [removeToken, userAddedTokens, chainId])
-
   const tokenList = useMemo(() => {
     return (
       chainId &&
@@ -73,9 +85,14 @@ export default function ManageTokens({
         <RowBetween key={token.address} width="100%">
           <RowFixed>
             <CurrencyLogo currency={token} size="20px" />
-            <Link external href={getBscScanLink(token.address, 'address', chainId)} color="textSubtle" ml="10px">
-              {token.symbol}
-            </Link>
+            <StyledLink
+              onClick={() => {
+                setImportToken(token)
+                handleCurrencySelect(token)
+              }}
+            >
+              {token.name} ({token.symbol})
+            </StyledLink>
           </RowFixed>
           <RowFixed>
             <IconButton variant="text" onClick={() => removeToken(chainId, token.address)}>
@@ -86,7 +103,7 @@ export default function ManageTokens({
         </RowBetween>
       ))
     )
-  }, [userAddedTokens, chainId, removeToken])
+  }, [userAddedTokens, chainId, removeToken, setImportToken, handleCurrencySelect])
 
   const isAddressValid = searchQuery === '' || isAddress(searchQuery)
 
@@ -95,7 +112,7 @@ export default function ManageTokens({
       <Column style={{ width: '100%', flex: '1 1' }}>
         <AutoColumn gap="14px">
           <Row>
-            <Input
+            <SearchInput
               id="token-search-input"
               scale="lg"
               placeholder="0x0000"
@@ -106,7 +123,7 @@ export default function ManageTokens({
               isWarning={!isAddressValid}
             />
           </Row>
-          {!isAddressValid && <Text color="failure">{t('Enter valid token address')}</Text>}
+          {!isAddressValid && <Text color="#a5a5a4">{t('Enter valid token address')}</Text>}
           {searchToken && (
             <ImportRow
               token={searchToken}
@@ -117,16 +134,6 @@ export default function ManageTokens({
           )}
         </AutoColumn>
         {tokenList}
-        <Footer>
-          <Text bold color="textSubtle">
-            {userAddedTokens?.length} {userAddedTokens.length === 1 ? t('Custom Token') : t('Custom Tokens')}
-          </Text>
-          {userAddedTokens.length > 0 && (
-            <Button variant="tertiary" onClick={handleRemoveAll}>
-              {t('Clear all')}
-            </Button>
-          )}
-        </Footer>
       </Column>
     </Wrapper>
   )

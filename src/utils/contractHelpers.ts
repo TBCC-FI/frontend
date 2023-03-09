@@ -31,7 +31,7 @@ import {
   getNftSaleAddress,
   getPancakeSquadAddress,
   getStakingAddress,
-  getNftAddress,
+  getNftAddress, getNftTDAAddress,
 } from 'utils/addressHelpers'
 
 // ABI
@@ -53,6 +53,7 @@ import lotteryV2Abi from 'config/abi/lotteryV2.json'
 import ICOAbi from 'config/abi/ico.json'
 import StakingAbi from 'config/abi/staking.json'
 import NftAbi from 'config/abi/nftTBCC.json'
+import NftTDAAbi from 'config/abi/nftTDA.json'
 import masterChef from 'config/abi/masterchef.json'
 import sousChef from 'config/abi/sousChef.json'
 import sousChefV2 from 'config/abi/sousChefV2.json'
@@ -142,6 +143,9 @@ export const getStakingContract = (signer?: ethers.Signer | ethers.providers.Pro
 }
 export const getNftContract = (signer?: ethers.Signer | ethers.providers.Provider) => {
   return getContract(NftAbi, getNftAddress(), signer)
+}
+export const getNftTDAContract = (signer?: ethers.Signer | ethers.providers.Provider) => {
+  return getContract(NftTDAAbi, getNftTDAAddress(), signer)
 }
 export const getMasterchefContract = (signer?: ethers.Signer | ethers.providers.Provider) => {
   return getContract(masterChef, getMasterChefAddress(), signer)

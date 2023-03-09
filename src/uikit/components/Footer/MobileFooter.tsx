@@ -12,7 +12,7 @@ const MobileFooter = () => {
 			<FooterColumn mb='20px'>
 				<Flex width='100%' justifyContent='flex-start'><TbccTextIcon mb='10px'/></Flex>
 				<Text fontWeight='400' fontSize='14px' color='rgba(255, 255, 255, 0.3)'>
-            © 2022 TBCC Labs
+            © 2023 TBCC Labs
         </Text>
 			</FooterColumn>
 			<FooterColumn>

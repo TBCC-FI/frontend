@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react'
-import { Text, Box, Card, Flex, Skeleton } from '../../../../../uikit'
 import LineChart from 'views/Swap/components/InfoCharts/LineChart'
 import BarChart from 'views/Swap/components/InfoCharts/BarChart'
 import CandleChart from 'views/Swap/components/InfoCharts/CandleChart'
@@ -8,6 +7,9 @@ import { useTranslation } from 'contexts/Localization'
 import { formatAmount } from 'views/Swap/utils/formatInfoNumbers'
 import { ChartEntry, TokenData, PriceChartEntry } from 'state/info/types'
 import { fromUnixTime } from 'date-fns'
+import { Text, Box, Card, Flex, Skeleton } from '../../../../../uikit'
+
+
 
 enum ChartView {
   LIQUIDITY,
@@ -21,6 +23,7 @@ interface ChartCardProps {
   tokenData?: TokenData
   tokenPriceData?: PriceChartEntry[]
 }
+
 
 const ChartCard: React.FC<ChartCardProps> = ({ variant, chartData, tokenData, tokenPriceData }) => {
   const [view, setView] = useState(ChartView.VOLUME)
@@ -76,19 +79,18 @@ const ChartCard: React.FC<ChartCardProps> = ({ variant, chartData, tokenData, to
       <Skeleton height="36px" width="128px" />
     )
   }
-
   return (
     <Card>
       <TabToggleGroup>
         <TabToggle isActive={view === ChartView.VOLUME} onClick={() => setView(ChartView.VOLUME)}>
-          <Text>{t('Volume')}</Text>
+          <Text color="rgba(255, 255, 255, 0.6)" >{t('Volume')}</Text>
         </TabToggle>
         <TabToggle isActive={view === ChartView.LIQUIDITY} onClick={() => setView(ChartView.LIQUIDITY)}>
-          <Text>{t('Liquidity')}</Text>
+          <Text color="rgba(255, 255, 255, 0.6)">{t('Liquidity')}</Text>
         </TabToggle>
         {variant === 'token' && (
           <TabToggle isActive={view === ChartView.PRICE} onClick={() => setView(ChartView.PRICE)}>
-            <Text>{t('Price')}</Text>
+            <Text color="rgba(255, 255, 255, 0.6)">{t('Price')}</Text>
           </TabToggle>
         )}
       </TabToggleGroup>

@@ -1,7 +1,9 @@
 import React from 'react'
-import { ChevronDownIcon, ChevronUpIcon } from '../Svg'
-import Button from './Button'
+import {ChevronDownIcon, ChevronUpSecondIcon} from '../Svg'
 import IconButton from './IconButton'
+import {Text} from "../Text";
+import {Flex} from "../Box";
+import {useTranslation} from "../../../contexts/Localization";
 
 interface Props {
   onClick?: () => void
@@ -9,10 +11,25 @@ interface Props {
 }
 
 export const ExpandableButton: React.FC<Props> = ({ onClick, expanded, children }) => {
+  const { t } = useTranslation()
+
   return (
-    <IconButton aria-label="Hide or show expandable content" onClick={onClick}>
+    <IconButton onClick={onClick} style={{backgroundColor: 'transparent'}}>
       {children}
-      {expanded ? <ChevronUpIcon color="invertedContrast" /> : <ChevronDownIcon color="invertedContrast" />}
+      {expanded ? (
+        <Flex alignItems='center'>
+          <Text fontSize='15px' fontWeight='500' color='#FFF'>
+            {expanded ? t('Hide Details') : t('Show Details')}
+          </Text>
+          <ChevronUpSecondIcon ml='8px' fill='white'/>
+        </Flex>
+      ) :
+        <Flex alignItems='center'>
+          <Text fontSize='15px' fontWeight='500' color='#FFF'>
+            {t('Show Details')}
+          </Text>
+          <ChevronDownIcon ml='8px' fill='white'/>
+        </Flex>}
     </IconButton>
   )
 }
@@ -22,14 +39,15 @@ ExpandableButton.defaultProps = {
 
 export const ExpandableLabel: React.FC<Props> = ({ onClick, expanded, children }) => {
   return (
-    <Button
-      variant="text"
-      aria-label="Hide or show expandable content"
-      onClick={onClick}
-      endIcon={expanded ? <ChevronUpIcon color="primary" /> : <ChevronDownIcon color="primary" />}
+    <Flex
+      width="100%"
+      height="70px"
+      justifyContent='center'
+      alignItems='center'
     >
+      <ExpandableButton expanded={expanded} onClick={onClick} />
       {children}
-    </Button>
+    </Flex>
   )
 }
 ExpandableLabel.defaultProps = {

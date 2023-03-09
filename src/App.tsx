@@ -7,7 +7,6 @@ import useScrollOnRouteChange from 'hooks/useScrollOnRouteChange'
 import { usePollBlockNumber } from 'state/block/hooks'
 import { usePollCoreFarmData } from 'state/farms/hooks'
 import { DatePickerPortal } from 'components/DatePicker'
-import Attention from 'components/Attention'
 import ResetCSS from './uikit/ResetCSS'
 import GlobalStyle from './style/Global'
 import Menu from './components/Menu'
@@ -38,6 +37,12 @@ const Liquidity = lazy(() => import('./views/Liquidity'))
 const AddLiquidity = lazy(() => import('./views/AddLiquidity'))
 const RemoveLiquidity = lazy(() => import('./views/RemoveLiquidity'));
 const Home = lazy(() => import('./views/Home'))
+const Analytics = lazy(() => import('./views/Analytics'))
+const Burn =lazy(() => import('./views/Burn'))
+const Lottery = lazy(() => import('./views/Lottery'))
+const Farms = lazy(() => import('./views/Farms'))
+const NftPage = lazy(() => import('./views/NFTpage'))
+const Team = lazy(() => import('./views/Team'))
 
 // This config is required for number formatting
 BigNumber.config({
@@ -60,15 +65,15 @@ const App: React.FC = () => {
       <ResetCSS />
       <GlobalStyle />
       <GlobalCheckClaimStatus excludeLocations={[]} />
-      <Attention/>
+      {/* <Attention/> */}
       <Menu extended={extended}>
         <SuspenseWithChunkError fallback={<PageLoader />}>
           <Switch>
             <Route exact strict path={PATHS.HOME}>
               <Home extended={extended} setExtended={setExtended} />
             </Route>
-            <Route exact strict path={PATHS.MINT}>
-              <Mint setExtended={setExtended}/>
+            <Route path={PATHS.MINT}>
+              <Mint />
             </Route>
             <Route exact strict path={PATHS.SWAP} component={Swap}/>
             <Route exact strict path={PATHS.LIQUIDITY}>
@@ -80,6 +85,22 @@ const App: React.FC = () => {
             <Route exact path={PATHS.ADDAB_LIQUIDITY} component={RedirectDuplicateTokenIds} />
             <Route exact strict path={PATHS.REMOVE_LIQUIDITY} component={RedirectOldRemoveLiquidityPathStructure} />
             <Route exact strict path={PATHS.REMOVEAB_LIQUIDITY} component={RemoveLiquidity} />
+            <Route exact strict path={PATHS.FARMS} component={Farms} />
+            <Route exact strict path={PATHS.LOTTERY}>
+              <Lottery setExtended={setExtended}/>
+            </Route>
+            <Route path={PATHS.ANALYTICS}>
+              <Analytics />
+            </Route>
+            <Route path={PATHS.BURN}>
+              <Burn />
+            </Route>
+            <Route exact strict path={PATHS.NFT}>
+              <NftPage setExtended={setExtended}/>
+            </Route>
+            <Route exact strict path={PATHS.TEAM}>
+              <Team/>
+            </Route>
             {/* 404 */}
             <Route component={NotFound} />
           </Switch>

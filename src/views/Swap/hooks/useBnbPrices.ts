@@ -9,10 +9,11 @@ export interface BnbPrices {
   oneDay: number
   twoDay: number
   week: number
+  month: number
 }
 
 const BNB_PRICES = gql`
-  query prices($block24: Int!, $block48: Int!, $blockWeek: Int!) {
+  query prices($block24: Int!, $block48: Int!, $blockWeek: Int!, $blockMonth: Int!) {
     current: bundle(id: "1") {
       bnbPrice
     }
@@ -23,6 +24,9 @@ const BNB_PRICES = gql`
       bnbPrice
     }
     oneWeek: bundle(id: "1", block: { number: $blockWeek }) {
+      bnbPrice
+    }
+    oneMonth: bundle(id: "1", block: { number: $blockMonth }) {
       bnbPrice
     }
   }
@@ -41,18 +45,23 @@ interface PricesResponse {
   oneWeek: {
     bnbPrice: string
   }
+  oneMonth: {
+    bnbPrice: string
+  }
 }
 
 const fetchBnbPrices = async (
   block24: number,
   block48: number,
   blockWeek: number,
+  blockMonth: number,
 ): Promise<{ bnbPrices: BnbPrices | undefined; error: boolean }> => {
   try {
     const data = await request<PricesResponse>(INFO_CLIENT, BNB_PRICES, {
       block24,
       block48,
       blockWeek,
+      blockMonth,
     })
     return {
       error: false,
@@ -61,6 +70,7 @@ const fetchBnbPrices = async (
         oneDay: parseFloat(data.oneDay?.bnbPrice ?? '0'),
         twoDay: parseFloat(data.twoDay?.bnbPrice ?? '0'),
         week: parseFloat(data.oneWeek?.bnbPrice ?? '0'),
+        month: parseFloat(data.oneMonth?.bnbPrice ?? '0'),
       },
     }
   } catch (error) {
@@ -79,13 +89,13 @@ export const useBnbPrices = (): BnbPrices | undefined => {
   const [prices, setPrices] = useState<BnbPrices | undefined>()
   const [error, setError] = useState(false)
 
-  const [t24, t48, tWeek] = getDeltaTimestamps()
-  const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek])
+  const [t24, t48, tWeek, , tMonth] = getDeltaTimestamps()
+  const { blocks, error: blockError } = useBlocksFromTimestamps([t24, t48, tWeek, tMonth])
 
   useEffect(() => {
     const fetch = async () => {
-      const [block24, block48, blockWeek] = blocks
-      const { bnbPrices, error: fetchError } = await fetchBnbPrices(block24.number, block48.number, blockWeek.number)
+      const [block24, block48, blockWeek, blockMonth] = blocks
+      const { bnbPrices, error: fetchError } = await fetchBnbPrices(block24.number, block48.number, blockWeek.number, blockMonth.number)
       if (fetchError) {
         setError(true)
       } else {

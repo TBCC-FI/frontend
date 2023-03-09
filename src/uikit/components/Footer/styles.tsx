@@ -77,8 +77,8 @@ export const StyledLink = styled.a`
   line-height: 42px;
   color: rgba(255, 255, 255, 0.6);
 `
-export const CustomContainer = styled(Flex)`
-  padding-left:270px;
+export const CustomContainer = styled(Flex)<{center?: boolean}>`
+  padding-left:${({center}) => center? '0px' : '270px'};
   padding-right:30px;
   width: 100%;
   max-width: 1640px;

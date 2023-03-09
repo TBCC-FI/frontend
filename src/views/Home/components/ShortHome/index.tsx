@@ -3,12 +3,15 @@ import styled from 'styled-components'
 import { useTranslation } from "contexts/Localization"
 import { useScrollTo } from 'react-use-window-scroll';
 import { Flex, Text, Box, Image, useMatchBreakpoints } from '../../../../uikit'
-import { StyledBtn, Container, SubContainer } from '../../style'
+import { StyledBtn } from '../../style'
 
-const TextContainer = styled(Flex) <{ isMobile?: boolean }>`
-	flex-direction: column;
-	max-width: 500px;
-	align-items: ${({ isMobile }) => isMobile ? 'center' : 'flex-start'};
+const Container = styled(Flex) <{ isMobile?: boolean }>`
+	width: 100%;
+	height: ${({ isMobile }) => isMobile ? '' : '100vh'};
+	flex-direction: ${({ isMobile }) => isMobile ? 'column-reverse' : 'row'};
+	align-items: center;
+	position: relative;
+	overflow-y: auto;
 `
 const Title = styled(Text) <{ isMobile?: boolean }>`
 	font-weight: 600;
@@ -28,8 +31,7 @@ const SubTitle = styled(Text) <{ isMobile?: boolean }>`
 const ShortHome = ({ setExtended }) => {
 
 	const { t } = useTranslation()
-	const { isMobile, isTablet } = useMatchBreakpoints()
-	const isSmall = isMobile || isTablet
+	const { isMobile } = useMatchBreakpoints()
 	const scrollTo = useScrollTo()
 
 	const extension = () => {
@@ -38,31 +40,29 @@ const ShortHome = ({ setExtended }) => {
 	}
 
 	return (
-		<Container isMobile={isSmall} style={{height: isSmall ? '' : '100vh'}}>
-			<SubContainer isMobile={isSmall}>
-				<TextContainer isMobile={isSmall}>
-					<Title mb='20px' isMobile={isSmall}>
-						{t('Trade, farm, swap on DEX universe')}
-					</Title>
-					<SubTitle isMobile={isSmall}>
-						{t('Enjoy the highest farming/trading rewards from unlimited referral levels!')}
-					</SubTitle>
-					<Box width='180px' mt='36px'>
-						<StyledBtn
-							onClick={extension}>
-							{t('Discover More')}
-						</StyledBtn>
-					</Box>
-					{isSmall && <Box height={80} />}
-				</TextContainer>
-				<Flex mt={isSmall && '70px'} justifyContent='center'>
-					<Image
-						src="images/HomePage/homepage-mainpic.png"
-						width={isSmall ? '90%' : '600px'}
-						height='auto'
-						style={{ maxWidth: '600px' }} />
-				</Flex>
-			</SubContainer>
+		<Container isMobile={isMobile}>
+			<Flex
+				flexDirection='column'
+				ml={!isMobile && '270px'}
+				width={!isMobile && '500px'}
+				alignItems={isMobile && 'center'}>
+				<Title mb='20px' isMobile={isMobile}>
+					{t('Trade, farm, swap on DEX universe')}
+				</Title>
+				<SubTitle isMobile={isMobile}>
+					{t('Enjoy the highest farming/trading rewards from unlimited referral levels!')}
+				</SubTitle>
+				<Box width='180px' mt='36px' mb={isMobile && '50px'}>
+					<StyledBtn
+						onClick={extension}>
+						{t('Discover More')}
+					</StyledBtn>
+				</Box>
+				{isMobile && <Box height={65}/>}
+			</Flex>
+			<Box mt={isMobile && '30px'}>
+				<Image src="images/HomePage/home-page_main-pic.png" width={isMobile ? '100%' : '1000px'} height='auto' />
+			</Box>
 		</Container>
 	)
 }

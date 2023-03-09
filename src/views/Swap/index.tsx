@@ -300,7 +300,7 @@ export default function Swap({ history }: RouteComponentProps) {
 
   return (
     <Page removePadding={isChartExpanded} hideFooterOnDesktop={isChartExpanded}>
-      <Flex width="100%" height={!isMobile && '100vh'} alignItems='center' justifyContent='center' position="relative" zIndex='10'>
+      <Flex width="100%" height={!isMobile ? 'auto' : '100vh'} alignItems='center' justifyContent='center' position="relative" zIndex='10'>
         {mobileTab === 0 ? (
           <Flex flexDirection="column" width={isMobile ? '100%' : 'auto'} alignItems='center'>
             <Title isMobile={isMobile} mt={isMobile && '83px'}>
@@ -320,7 +320,7 @@ export default function Swap({ history }: RouteComponentProps) {
               >
                 <AppBody boxShadow="0px 8px 16px rgba(0, 0, 0, 0.02)" maxWidth='100%'>
                   <CurrencyInputHeader
-                    isActiveTab={t('Swap')}
+                    isActiveTab="Swap"
                   />
                   <Wrapper id="swap-page" isMobile={isMobile}>
                     <SwapTokensBtn>
@@ -332,7 +332,7 @@ export default function Swap({ history }: RouteComponentProps) {
                     </SwapTokensBtn>
                     <AutoColumn gap="9px">
                       <CurrencyInputPanel
-                        label={t('from')}
+                        label={t('From')}
                         value={formattedAmounts[Field.INPUT]}
                         currency={currencies[Field.INPUT]}
                         onUserInput={handleTypeInput}
@@ -344,7 +344,7 @@ export default function Swap({ history }: RouteComponentProps) {
                       <CurrencyInputPanel
                         value={formattedAmounts[Field.OUTPUT]}
                         onUserInput={handleTypeOutput}
-                        label={t('to')}
+                        label={t('To')}
                         currency={currencies[Field.OUTPUT]}
                         onCurrencySelect={handleOutputSelect}
                         id="swap-currency-output"
@@ -489,6 +489,7 @@ export default function Swap({ history }: RouteComponentProps) {
             </Flex>
           </Flex>
         ) : null}
+        {isMobile && <Box height={65}/>}
       </Flex>
     </Page>
   )

@@ -1,13 +1,12 @@
 import React, { KeyboardEvent, RefObject, useCallback, useMemo, useRef, useState, useEffect } from 'react'
 import { useTranslation } from 'contexts/Localization'
 import { FixedSizeList } from 'react-window'
-import { useAudioModeManager } from 'state/user/hooks'
 import useDebounce from 'hooks/useDebounce'
 import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import styled from "styled-components";
 import { Currency, ETHER, Token } from '../../sdk'
 import { Text, Input, Box, useMatchBreakpoints } from '../../uikit'
-import { useAllTokens } from '../../hooks/Tokens'
+import { useAllTokens, useToken, useIsUserAddedToken, useFoundOnInactiveList } from '../../hooks/Tokens'
 import { isAddress } from '../../utils'
 import Column, { AutoColumn } from '../Layout/Column'
 import Row from '../Layout/Row'
@@ -15,14 +14,16 @@ import CommonBases from './CommonBases'
 import CurrencyList from './CurrencyList'
 import { filterTokens, useSortedTokensByQuery } from './filtering'
 import useTokenComparator from './sorting'
+import ImportRow from './ImportRow'
 
 interface CurrencySearchProps {
   selectedCurrency?: Currency | null
   onCurrencySelect: (currency: Currency) => void
   showCommonBases?: boolean
-}
+  showImportView?: () => void
+  setImportToken?: (token: Token) => void
 
-const swapSound = new Audio('swap.mp3')
+}
 
 const SelectRow = styled(Row)`
   position: relative;
@@ -60,6 +61,8 @@ function CurrencySearch({
   selectedCurrency,
   onCurrencySelect,
   showCommonBases,
+  showImportView,
+  setImportToken
 }: CurrencySearchProps) {
   const { t } = useTranslation()
   const { chainId } = useActiveWeb3React()
@@ -75,8 +78,8 @@ function CurrencySearch({
 
   const allTokens = useAllTokens()
 
-  // if they input an address, use it
-  const [audioPlay] = useAudioModeManager()
+  const searchToken = useToken(debouncedQuery)
+  const searchTokenIsAdded = useIsUserAddedToken(searchToken)
 
   const tokenComparator = useTokenComparator(invertSearchOrder)
 
@@ -93,11 +96,8 @@ function CurrencySearch({
   const handleCurrencySelect = useCallback(
     (currency: Currency) => {
       onCurrencySelect(currency)
-      if (audioPlay) {
-        swapSound.play()
-      }
     },
-    [audioPlay, onCurrencySelect],
+    [onCurrencySelect],
   )
 
   // manage focus on modal show
@@ -134,6 +134,10 @@ function CurrencySearch({
     [filteredSortedTokens, handleCurrencySelect, debouncedQuery],
   )
 
+  // if no results on main list, show option to expand into inactive
+  const inactiveTokens = useFoundOnInactiveList(debouncedQuery)
+  const filteredInactiveTokens: Token[] = useSortedTokensByQuery(inactiveTokens, debouncedQuery)
+
   return (
     <>
       <div>
@@ -154,14 +158,22 @@ function CurrencySearch({
             <CommonBases chainId={chainId} onSelect={handleCurrencySelect} selectedCurrency={selectedCurrency} />
           )}
         </AutoColumn>
-        {filteredSortedTokens?.length > 0 ? (
+        {searchToken && !searchTokenIsAdded ? (
+          <Column style={{ padding: '20px 0', height: '100%' }}>
+            <ImportRow token={searchToken} showImportView={showImportView} setImportToken={setImportToken} />
+          </Column>
+        ) : filteredSortedTokens?.length > 0 || filteredInactiveTokens?.length > 0 ? (
           <Box margin="16px -20px">
             <CurrencyList
               height={isMobile ? 242 : 224}
-              currencies={filteredSortedTokens}
-              breakIndex={undefined}
+              currencies={
+                filteredInactiveTokens ? filteredSortedTokens.concat(filteredInactiveTokens) : filteredSortedTokens
+              }
+              breakIndex={inactiveTokens && filteredSortedTokens ? filteredSortedTokens.length : undefined}
               onCurrencySelect={handleCurrencySelect}
               fixedListRef={fixedList}
+              showImportView={showImportView}
+              setImportToken={setImportToken}
             />
           </Box>
         ) : (

@@ -40,6 +40,12 @@ export type Transaction = {
   amountToken1: number
 }
 
+export type BurnTransaction = {
+  sender: string
+  amount: number
+  amountUSD: number
+}
+
 export interface ProtocolData {
   volumeUSD: number
   volumeUSDChange: number // in 24h, as percentage
@@ -151,6 +157,10 @@ export interface InfoState {
   protocol: ProtocolState
   pools: PoolsState
   tokens: TokensState
+  burns: {
+    readonly independentField: TokenBurnFields
+    readonly typedValue: string
+  }
 }
 
 // Token analytics data redux state
@@ -167,4 +177,9 @@ export interface ApiResponseTokenAnalyticsData {
       total_supply: number
     }
   }
+}
+
+export enum TokenBurnFields {
+  TOKEN_PERCENT = 'TOKEN_PERCENT',
+  TOKEN = 'TOKEN',
 }

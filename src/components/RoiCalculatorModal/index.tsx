@@ -1,5 +1,9 @@
 import React, { useRef, useEffect } from 'react'
 import styled from 'styled-components'
+import BigNumber from 'bignumber.js'
+import { useTranslation } from 'contexts/Localization'
+import { getBalanceNumber } from 'utils/formatBalance'
+import useActiveWeb3React from 'hooks/useActiveWeb3React'
 import {
   Modal,
   Text,
@@ -11,11 +15,7 @@ import {
   HelpIcon,
   ButtonMenuItem,
   useTooltip,
-} from '../../uikit'
-import BigNumber from 'bignumber.js'
-import { useTranslation } from 'contexts/Localization'
-import { getBalanceNumber } from 'utils/formatBalance'
-import useActiveWeb3React from 'hooks/useActiveWeb3React'
+} from '../../uikit';
 import RoiCalculatorFooter from './RoiCalculatorFooter'
 import RoiCard from './RoiCard'
 import useRoiCalculatorReducer, { CalculatorMode, EditingCurrency } from './useRoiCalculatorReducer'

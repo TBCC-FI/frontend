@@ -16,10 +16,9 @@ interface TopPoolsResponse {
 const fetchTopPools = async (timestamp24hAgo: number): Promise<string[]> => {
   try {
     const query = gql`
-      query topPools($blacklist: [String!], $timestamp24hAgo: Int) {
+      query topPools {
         pairDayDatas(
-          first: 30
-          where: { dailyTxns_gt: 300, token0_not_in: $blacklist, token1_not_in: $blacklist, date_gt: $timestamp24hAgo }
+          first: 300
           orderBy: dailyVolumeUSD
           orderDirection: desc
         ) {
@@ -28,13 +27,34 @@ const fetchTopPools = async (timestamp24hAgo: number): Promise<string[]> => {
       }
     `
     const data = await request<TopPoolsResponse>(INFO_CLIENT, query, { blacklist: TOKEN_BLACKLIST, timestamp24hAgo })
-    // pairDayDatas id has compound id "0xPOOLADDRESS-NUMBERS", extracting pool address with .split('-')
     return data.pairDayDatas.map((p) => p.id.split('-')[0])
   } catch (error) {
     console.error('Failed to fetch top pools', error)
     return []
   }
 }
+// const fetchTopPools = async (timestamp24hAgo: number): Promise<string[]> => {
+//   try {
+//     const query = gql`
+//       query topPools($blacklist: [String!], $timestamp24hAgo: Int) {
+//         pairDayDatas(
+//           first: 30
+//           where: { dailyTxns_gt: 300, token0_not_in: $blacklist, token1_not_in: $blacklist, date_gt: $timestamp24hAgo }
+//           orderBy: dailyVolumeUSD
+//           orderDirection: desc
+//         ) {
+//           id
+//         }
+//       }
+//     `
+//     const data = await request<TopPoolsResponse>(INFO_CLIENT, query, { blacklist: TOKEN_BLACKLIST, timestamp24hAgo })
+//     // pairDayDatas id has compound id "0xPOOLADDRESS-NUMBERS", extracting pool address with .split('-')
+//     return data.pairDayDatas.map((p) => p.id.split('-')[0])
+//   } catch (error) {
+//     console.error('Failed to fetch top pools', error)
+//     return []
+//   }
+// }
 
 /**
  * Fetch top addresses by volume

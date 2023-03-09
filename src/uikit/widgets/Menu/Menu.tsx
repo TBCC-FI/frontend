@@ -142,6 +142,16 @@ const Menu: React.FC<any> = ({
           <Box position='fixed' zIndex='20' top='15px' left='18px'>
             <LogoIcon />
           </Box>
+          <Box width='56px' minHeight='36px' position='fixed' top='8px' right='105px' zIndex={20}>
+            <LangSelector
+              currentLang={currentLang}
+              langs={langs}
+              setLang={setLang}
+              buttonScale="xs"
+              color="textSubtle"
+              hideLanguage
+            />
+          </Box>
           <Box width='56px' minHeight='36px' position='fixed' top='15px' right='60px' zIndex={20}>
             <CurrDropdown />
           </Box>

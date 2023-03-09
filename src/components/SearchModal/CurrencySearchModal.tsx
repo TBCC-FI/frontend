@@ -1,7 +1,7 @@
-import React, { useCallback } from 'react'
+import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
 import { useTranslation } from 'contexts/Localization'
-import { Currency } from '../../sdk'
+import { Currency, Token } from '../../sdk'
 import {
   ModalContainer,
   ModalHeader,
@@ -11,6 +11,9 @@ import {
   Heading, Button, useMatchBreakpoints,
 } from '../../uikit'
 import CurrencySearch from './CurrencySearch'
+import ImportToken from './ImportToken'
+import { CurrencyModalView } from './types'
+import ManageTokens from "./ManageTokens";
 
 const StyledModalContainer = styled(ModalContainer)<{ isMobile?: boolean }>`
   max-width: ${({ isMobile }) => isMobile ? 'calc(100% - 30px' : '320px'};
@@ -38,6 +41,17 @@ const StyledCanselBtn = styled(Button)`
   height: 40px;
 `
 
+const StyledAddBtn = styled(Button)`
+  background: linear-gradient(77.9deg,#DB00FF -3.83%,#2C5EE0 110.36%);
+  border-radius: 4px;
+  padding: 12px 4px;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 16px;
+  height: 40px;
+`
+
 interface CurrencySearchModalProps extends InjectedModalProps {
   selectedCurrency?: Currency | null
   onCurrencySelect: (currency: Currency) => void
@@ -50,6 +64,8 @@ export default function CurrencySearchModal({
   selectedCurrency,
   showCommonBases = false,
 }: CurrencySearchModalProps) {
+  const [modalView, setModalView] = useState<CurrencyModalView>(CurrencyModalView.search)
+
   const handleCurrencySelect = useCallback(
     (currency: Currency) => {
       onDismiss()
@@ -57,6 +73,9 @@ export default function CurrencySearchModal({
     },
     [onDismiss, onCurrencySelect],
   )
+
+  // used for import token flow
+  const [importToken, setImportToken] = useState<Token | undefined>()
 
   const { t } = useTranslation()
   const { isMobile } = useMatchBreakpoints()
@@ -69,11 +88,35 @@ export default function CurrencySearchModal({
         </ModalTitle>
       </ModalHeader>
       <StyledModalBody padding={isMobile ? '17px' : '20px'}>
-        <CurrencySearch
-          onCurrencySelect={handleCurrencySelect}
-          selectedCurrency={selectedCurrency}
-          showCommonBases={showCommonBases}
-        />
+        {
+          modalView === CurrencyModalView.search ? (
+            <CurrencySearch
+              onCurrencySelect={handleCurrencySelect}
+              selectedCurrency={selectedCurrency}
+              showCommonBases={showCommonBases}
+              showImportView={() => setModalView(CurrencyModalView.importToken)}
+              setImportToken={setImportToken}
+            />
+          ) : modalView === CurrencyModalView.importToken && importToken ? (
+            <ImportToken tokens={[importToken]} handleCurrencySelect={handleCurrencySelect}/>
+          ) : modalView === CurrencyModalView.manage ? (
+            <ManageTokens
+              setModalView={setModalView}
+              setImportToken={setImportToken}
+              handleCurrencySelect={handleCurrencySelect}
+            />
+          ) : (
+            ''
+          )}
+        {modalView === CurrencyModalView.search && (
+          <StyledAddBtn
+            width="100%"
+            mb="20px"
+            onClick={() => setModalView(CurrencyModalView.manage)}
+          >
+            {t('Add Token')}
+          </StyledAddBtn>
+        )}
         <StyledCanselBtn width="100%" onClick={onDismiss}>
           {t('Cancel')}
         </StyledCanselBtn>

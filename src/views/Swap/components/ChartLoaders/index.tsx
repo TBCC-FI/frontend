@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
-import { Box, Text } from '../../../../uikit'
 import { useTranslation } from 'contexts/Localization'
+import { Box, Text } from '../../../../uikit'
 import LineChartLoaderSVG from './LineChartLoaderSVG'
 import BarChartLoaderSVG from './BarChartLoaderSVG'
 import CandleChartLoaderSVG from './CandleChartLoaderSVG'
